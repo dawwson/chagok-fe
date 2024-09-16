@@ -1,4 +1,8 @@
+import { useEffect, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import LoadingScreen from "./components/organisms/LoadingScreen";
+
 import Layout from "./pages/Layout";
 import HomePage from "./pages/HomePage";
 import AddEntryPage from "./pages/AddEntryPage";
@@ -8,10 +12,18 @@ import LoginPage from "./pages/LoginPage";
 import JoinPage from "./pages/JoinPage";
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const checkAuth = async () => {
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
   return (
-    <>
-      <RouterProvider router={router} />
-    </>
+    <>{isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}</>
   );
 }
 
