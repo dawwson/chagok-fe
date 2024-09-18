@@ -3,12 +3,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import reset from "styled-reset";
 
-import LoadingScreen from "./components/organisms/LoadingScreen";
 import { lightTheme } from "./configs/theme";
+import LoadingScreen from "./components/organisms/LoadingScreen";
+import MainLayout from "./components/templates/MainLayout";
 
-import Layout from "./pages/Layout";
 import HomePage from "./pages/HomePage";
 import AddEntryPage from "./pages/AddEntryPage";
+import ProfilePage from "./pages/ProfilePage";
 import ManageBudgetPage from "./pages/ManageBudgetPage";
 import StatsPage from "./pages/StatsPage";
 import LoginPage from "./pages/LoginPage";
@@ -36,11 +37,15 @@ function App() {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: <MainLayout />,
     children: [
       {
         path: "",
         element: <HomePage />,
+      },
+      {
+        path: "/profile",
+        element: <ProfilePage />,
       },
       {
         path: "/add-entry",

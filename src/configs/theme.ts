@@ -24,7 +24,7 @@ export const lightTheme = {
     accent: DARK_BLUE,
     danger: RED,
   },
-  buttenText: {
+  buttonText: {
     primary: WHITE,
     secondary: BLACK,
     danger: WHITE,
