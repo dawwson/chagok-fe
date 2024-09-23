@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { createGlobalStyle, ThemeProvider } from "styled-components";
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
 import reset from "styled-reset";
 
 import { lightTheme } from "./configs/theme";
+import { AuthProvider } from "./contexts/auth";
 import LoadingScreen from "./components/organisms/LoadingScreen";
 import MainLayout from "./components/templates/MainLayout";
+import PrivateRoute from "./components/templates/PrivateRoute";
 
 import HomePage from "./pages/HomePage";
 import AddEntryPage from "./pages/AddEntryPage";
@@ -27,17 +29,25 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider theme={lightTheme}>
-      <GlobalStyles />
-      {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider theme={lightTheme}>
+        <Wrapper>
+          <GlobalStyles />
+          {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
+        </Wrapper>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <PrivateRoute>
+        <MainLayout />
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "",
@@ -82,6 +92,12 @@ const GlobalStyles = createGlobalStyle`
     color: ${({ theme }) => theme.text.primary};
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
+`;
+
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
 `;
 
 export default App;
