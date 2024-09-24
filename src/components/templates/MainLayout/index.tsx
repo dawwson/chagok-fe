@@ -1,7 +1,7 @@
 import { Link, Outlet } from "react-router-dom";
 import * as S from "./style";
 
-const Layout = () => {
+const MainLayout = () => {
   const handleClickLogout = () => {
     // TODO: 로그아웃 로직
   };
@@ -123,4 +123,4 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default MainLayout;
