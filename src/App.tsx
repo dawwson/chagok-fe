@@ -4,8 +4,10 @@ import { createGlobalStyle, ThemeProvider } from "styled-components";
 import reset from "styled-reset";
 
 import { lightTheme } from "./configs/theme";
+import { AuthProvider } from "./contexts/auth";
 import LoadingScreen from "./components/organisms/LoadingScreen";
 import MainLayout from "./components/templates/MainLayout";
+import PrivateRoute from "./components/templates/PrivateRoute";
 
 import HomePage from "./pages/HomePage";
 import AddEntryPage from "./pages/AddEntryPage";
@@ -14,6 +16,7 @@ import ManageBudgetPage from "./pages/ManageBudgetPage";
 import StatsPage from "./pages/StatsPage";
 import LoginPage from "./pages/LoginPage";
 import JoinPage from "./pages/JoinPage";
+import AuthLayout from "./components/templates/AuthLayout";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,17 +30,23 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider theme={lightTheme}>
-      <GlobalStyles />
-      {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider theme={lightTheme}>
+        <GlobalStyles />
+        {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <PrivateRoute>
+        <MainLayout />
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "",
@@ -63,11 +72,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <LoginPage />,
+    element: (
+      <AuthLayout>
+        <LoginPage />
+      </AuthLayout>
+    ),
   },
   {
     path: "/join",
-    element: <JoinPage />,
+    element: (
+      <AuthLayout>
+        <JoinPage />
+      </AuthLayout>
+    ),
   },
 ]);
 
