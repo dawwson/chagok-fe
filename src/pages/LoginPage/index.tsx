@@ -45,11 +45,6 @@ const LoginPage = () => {
         if (error.errorCode === "USER_PASSWORD_IS_WRONG") {
           setError("The password you entered is incorrect. Please try again.");
         }
-        if (error.errorCode === "USER_EMAIL_IS_DUPLICATED") {
-          setError(
-            "This email address cannot be used. Please try a different one."
-          );
-        }
       } else {
         console.log(error);
       }

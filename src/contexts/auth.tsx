@@ -20,7 +20,7 @@ interface Props {
 
 interface User {
   id: string;
-  email: string;
+  nickname: string;
 }
 
 const STORED_USER_KEY = "currentUser";
