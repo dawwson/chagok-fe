@@ -1,12 +1,9 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import * as S from "./style";
 
 const Layout = () => {
-  const navigate = useNavigate();
-
   const handleClickLogout = () => {
     // TODO: 로그아웃 로직
-    navigate("/login");
   };
 
   const handleClickMore = () => {
