@@ -42,8 +42,7 @@ export const AuthProvider = ({ children }: Props) => {
     const storedUser = localStorage.getItem(STORED_USER_KEY);
 
     if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setCurrentUser(user); // 초기화 시 로컬 스토리지에서 사용자 정보 설정
+      setCurrentUser(JSON.parse(storedUser)); // 초기화 시 로컬 스토리지에서 사용자 정보 설정
     }
   }, []);
 
