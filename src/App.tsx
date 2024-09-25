@@ -10,7 +10,7 @@ import MainLayout from "./components/templates/MainLayout";
 import PrivateRoute from "./components/templates/PrivateRoute";
 
 import HomePage from "./pages/HomePage";
-import AddEntryPage from "./pages/AddEntryPage";
+import AddTransactionPage from "./pages/AddTransactionPage";
 import ProfilePage from "./pages/ProfilePage";
 import ManageBudgetPage from "./pages/ManageBudgetPage";
 import StatsPage from "./pages/StatsPage";
@@ -57,8 +57,8 @@ const router = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
-        path: "/add-entry",
-        element: <AddEntryPage />,
+        path: "/add-transaction",
+        element: <AddTransactionPage />,
       },
       {
         path: "/manage-budget",
