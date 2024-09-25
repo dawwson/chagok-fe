@@ -3,7 +3,7 @@ import { styled } from "styled-components";
 export const Container = styled.div`
   display: flex;
   height: 100vh;
-  padding: 30px;
+  padding: 50px;
 `;
 
 export const LeftWrapper = styled.div`
@@ -11,8 +11,7 @@ export const LeftWrapper = styled.div`
 `;
 
 export const RightWrapper = styled.div`
-  flex: 10;
-  /* background-color: #f090ff; // NOTE: 임시 배경색. 나중에 삭제하기 */
+  flex: 12;
 `;
 
 export const Menu = styled.div`
