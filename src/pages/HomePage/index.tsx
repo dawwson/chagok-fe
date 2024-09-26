@@ -1,8 +1,11 @@
-import styled from "styled-components";
-import { useAuth } from "../../contexts/auth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import styled from "styled-components";
+import { useAuth } from "../../contexts/auth";
 import { capitalize } from "../../utils/string";
+import Calendar from "../../components/organisms/Calendar";
+import dayjs, { Dayjs } from "dayjs";
 
 interface Transaction {
   trasactionId: number;
@@ -19,6 +22,7 @@ interface Transaction {
 const HomePage = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [trasactions, setTransactions] = useState<Array<Transaction>>([
     {
       trasactionId: 1,
@@ -48,6 +52,11 @@ const HomePage = () => {
     navigate("/add-transaction");
   };
 
+  const handleOnChangeDate = (date: Dayjs) => {
+    // TODO: <api 연동> date에 해당하는 날짜의 트랜잭션 가져오기
+    setSelectedDate(date);
+  };
+
   useEffect(() => {
     if (!currentUser) {
       navigate("/login");
@@ -61,7 +70,9 @@ const HomePage = () => {
         <Description>
           🔖 Income : &nbsp;₩2,000,000 &nbsp; Expense : ₩1,000,000
         </Description>
-        <CalendarContainer></CalendarContainer>
+        <CalendarContainer>
+          <Calendar selectedDate={selectedDate} onChange={handleOnChangeDate} />
+        </CalendarContainer>
       </LeftWrapper>
       <RightWrapper>
         <ButtonContainer>
@@ -72,7 +83,7 @@ const HomePage = () => {
             <Empty>Try to add a new transaction!</Empty>
           ) : (
             trasactions.map((tr) => (
-              <ListItem>
+              <ListItem key={tr.trasactionId}>
                 <Category>{tr.categoryName}</Category>
                 <PaymentMethod>{capitalize(tr.paymentMethod)}</PaymentMethod>
                 <Amount type={tr.type}>
@@ -124,6 +135,7 @@ export const CalendarContainer = styled.div`
   background-color: ${({ theme }) => theme.background.white};
   border-radius: 20px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
 `;
 
 export const RightWrapper = styled.div`
