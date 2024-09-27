@@ -1,9 +1,20 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+
 import * as S from "./style";
+import { logout } from "../../../apis/auth";
+import { useAuth } from "../../../contexts/auth";
 
 const MainLayout = () => {
-  const handleClickLogout = () => {
-    // TODO: 로그아웃 로직
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleClickLogout = async () => {
+    const ok = confirm("정말 로그아웃 하시겠습니까?"); // TODO: 모달로 변경
+    if (ok) {
+      await logout();
+      signOut();
+      navigate("/login", { replace: true });
+    }
   };
 
   const handleClickMore = () => {

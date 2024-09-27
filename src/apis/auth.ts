@@ -4,28 +4,7 @@ import axiosInstance from "./axiosInstance";
 
 const API_URL = "/auth";
 
-export const signInWithEmailAndPassword = async (
-  email: string,
-  password: string
-) => {
-  try {
-    const response = await axiosInstance.post(
-      `${API_URL}/sign-in`,
-      { email, password },
-      { withCredentials: true }
-    );
-
-    const { data } = response.data;
-    return data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      const { path, errorCode, detail, timestamp } = error.response.data;
-      throw new ApiError(path, errorCode, detail, timestamp);
-    }
-    throw new Error(`Error: ${API_URL}/sign-in`);
-  }
-};
-
+// 이메일/비밀번호로 회원가입
 export const signUpWithEmailAndPassword = async (
   email: string,
   password: string,
@@ -45,18 +24,46 @@ export const signUpWithEmailAndPassword = async (
       const { path, errorCode, detail, timestamp } = error.response.data;
       throw new ApiError(path, errorCode, detail, timestamp);
     }
-    throw new Error(`Error: ${API_URL}/sign-up`);
+    throw new Error(`Error: ${API_URL}/sign-up - ${error}`);
   }
 };
 
-/*
-// 로그아웃 API 요청
-export const logout = async () => {
-  const response = await axiosInstance.post(
-    `${API_URL}/logout`,
-    {},
-    { withCredentials: true }
-  );
-  return response.data;
+// 이메일/비밀번호로 로그인
+export const signInWithEmailAndPassword = async (
+  email: string,
+  password: string
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `${API_URL}/sign-in`,
+      { email, password },
+      { withCredentials: true }
+    );
+
+    const { data } = response.data;
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      const { path, errorCode, detail, timestamp } = error.response.data;
+      throw new ApiError(path, errorCode, detail, timestamp);
+    }
+    throw new Error(`Error: ${API_URL}/sign-in - ${error}`);
+  }
 };
-*/
+
+// 로그아웃
+export const logout = async () => {
+  try {
+    await axiosInstance.post(
+      `${API_URL}/sign-out`,
+      {},
+      { withCredentials: true }
+    );
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      const { path, errorCode, detail, timestamp } = error.response.data;
+      throw new ApiError(path, errorCode, detail, timestamp);
+    }
+    throw new Error(`Error: ${API_URL}/sign-in - ${error}`);
+  }
+};
