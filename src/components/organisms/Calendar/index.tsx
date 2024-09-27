@@ -45,8 +45,15 @@ const Calendar = ({ selectedDate, onChange }: Props) => {
             minHeight: "48px",
             minWidth: "48px",
             fontSize: "18px",
+            "&:hover": {
+              backgroundColor: "#E6E6E6",
+            },
+            // 선택된 날짜 셀
             "&.Mui-selected": {
               backgroundColor: "#0D99FF",
+              "&:focus": {
+                backgroundColor: "#0D99FF",
+              },
             },
           },
         }}
