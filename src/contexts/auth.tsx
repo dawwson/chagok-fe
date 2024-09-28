@@ -2,14 +2,14 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 interface Context {
   currentUser: User | null;
-  signIn: (user: User) => void;
-  signOut: () => void;
+  authenticate: (user: User) => void;
+  deauthenticate: () => void;
 }
 
 const AuthContext = createContext<Context>({
   currentUser: null,
-  signIn: () => {},
-  signOut: () => {},
+  authenticate: () => {},
+  deauthenticate: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -28,12 +28,12 @@ const STORED_USER_KEY = "currentUser";
 export const AuthProvider = ({ children }: Props) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  const signIn = (user: User) => {
+  const authenticate = (user: User) => {
     setCurrentUser(user);
     localStorage.setItem(STORED_USER_KEY, JSON.stringify(user));
   };
 
-  const signOut = () => {
+  const deauthenticate = () => {
     setCurrentUser(null);
     localStorage.removeItem(STORED_USER_KEY);
   };
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }: Props) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, signIn, signOut }}>
+    <AuthContext.Provider value={{ currentUser, authenticate, deauthenticate }}>
       {children}
     </AuthContext.Provider>
   );
