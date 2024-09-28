@@ -4,6 +4,7 @@ const API_URL = "/auth";
 
 interface SignUpResponse {
   id: string;
+  email: string;
   nickname: string;
 }
 
