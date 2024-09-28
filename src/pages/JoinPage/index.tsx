@@ -47,11 +47,12 @@ const JoinPage = () => {
             "This email address cannot be used. Please try a different one."
           );
         }
-      } else {
-        console.log(error);
       }
     } finally {
       setIsLoading(false);
+      setEmail("");
+      setPassword("");
+      setNickname("");
     }
   };
 
@@ -87,6 +88,7 @@ const JoinPage = () => {
           placeholder="Nickname"
           onChange={handleOnChange}
           required
+          minLength={2}
         />
         <S.Input
           type="submit"
