@@ -103,6 +103,7 @@ const HomePage = () => {
 
 export default HomePage;
 
+// TODO: 스타일 파일로 이동
 export const Wrapper = styled.div`
   width: 100%;
   height: 100%;
