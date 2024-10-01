@@ -6,6 +6,12 @@ import { useAuth } from "../../contexts/auth";
 import { capitalize } from "../../utils/string";
 import Calendar from "../../components/organisms/Calendar";
 import dayjs, { Dayjs } from "dayjs";
+import { getTxSum } from "../../apis/tx";
+
+interface Sum {
+  totalIncome: number;
+  totalExpense: number;
+}
 
 interface Transaction {
   trasactionId: number;
@@ -23,6 +29,7 @@ const HomePage = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [sum, setSum] = useState<Sum | null>(null);
   const [trasactions, setTransactions] = useState<Array<Transaction>>([
     {
       trasactionId: 1,
@@ -63,12 +70,25 @@ const HomePage = () => {
     }
   }, [currentUser, navigate]);
 
+  useEffect(() => {
+    const fetchSum = async () => {
+      const startDate = selectedDate.startOf("month").toISOString();
+      const endDate = selectedDate.endOf("month").toISOString();
+
+      const { totalIncome, totalExpense } = await getTxSum(startDate, endDate);
+      setSum({ totalIncome, totalExpense });
+    };
+
+    fetchSum();
+  }, [selectedDate]);
+
   return (
     <Wrapper>
       <LeftWrapper>
         <Title>Welcome to Chagok, {currentUser?.nickname}!</Title>
         <Description>
-          🔖 Income : &nbsp;₩2,000,000 &nbsp; Expense : ₩1,000,000
+          🔖 Income : &nbsp;₩{sum?.totalIncome.toLocaleString() ?? 0} &nbsp;
+          Expense : ₩{sum?.totalExpense.toLocaleString() ?? 0}
         </Description>
         <CalendarContainer>
           <Calendar selectedDate={selectedDate} onChange={handleOnChangeDate} />
