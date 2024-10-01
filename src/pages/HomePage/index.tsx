@@ -1,66 +1,48 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import styled from "styled-components";
+import dayjs, { Dayjs } from "dayjs";
+
+import { getTxs, getTxSum } from "../../apis/tx";
+import Calendar from "../../components/organisms/Calendar";
 import { useAuth } from "../../contexts/auth";
 import { capitalize } from "../../utils/string";
-import Calendar from "../../components/organisms/Calendar";
-import dayjs, { Dayjs } from "dayjs";
-import { getTxSum } from "../../apis/tx";
+
+type TxType = "income" | "expense";
+type TxMethod = "cash" | "debit card" | "credit card" | "bank transfer";
 
 interface Sum {
   totalIncome: number;
   totalExpense: number;
 }
 
-interface Transaction {
-  trasactionId: number;
-  categoryId: number;
+interface Tx {
+  id: number;
   categoryName: string;
-  type: "income" | "expense";
-  paymentMethod: string;
+  txType: TxType;
+  txMethod: TxMethod;
   amount: number;
-  date: string;
-  description: string;
-  createdAt: string;
+  date: string; // ISO string
 }
 
 const HomePage = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [sum, setSum] = useState<Sum | null>(null);
-  const [trasactions, setTransactions] = useState<Array<Transaction>>([
-    {
-      trasactionId: 1,
-      categoryId: 1,
-      categoryName: "Food",
-      type: "expense",
-      paymentMethod: "cash",
-      amount: 6000,
-      date: "2024-08-31T04:22:17.531Z",
-      description: "떡볶이",
-      createdAt: "2024-08-31T04:22:17.531Z",
-    },
-    {
-      trasactionId: 2,
-      categoryId: 10,
-      categoryName: "Salary",
-      type: "income",
-      paymentMethod: "bank transfer",
-      amount: 6000000,
-      date: "2024-08-31T04:22:17.531Z",
-      description: "월급",
-      createdAt: "2024-08-31T04:22:17.531Z",
-    },
-  ]);
+  const [txs, setTxs] = useState<Tx[]>([]);
 
   const handleOnClickAdd = () => {
     navigate("/add-transaction");
   };
 
-  const handleOnChangeDate = (date: Dayjs) => {
-    // TODO: <api 연동> date에 해당하는 날짜의 트랜잭션 가져오기
+  const handleOnChangeDate = async (date: Dayjs) => {
+    const startDate = date.startOf("day").toISOString();
+    const endDate = date.endOf("day").toISOString();
+
+    const txs = await getTxs(startDate, endDate);
+    setTxs(txs);
     setSelectedDate(date);
   };
 
@@ -96,19 +78,19 @@ const HomePage = () => {
       </LeftWrapper>
       <RightWrapper>
         <ButtonContainer>
-          <Button onClick={handleOnClickAdd}>Add an transaction</Button>
+          <Button onClick={handleOnClickAdd}>Add a transaction</Button>
         </ButtonContainer>
         <ListItemContainer>
-          {trasactions.length === 0 ? (
+          {txs.length === 0 ? (
             <Empty>Try to add a new transaction!</Empty>
           ) : (
-            trasactions.map((tr) => (
-              <ListItem key={tr.trasactionId}>
-                <Category>{tr.categoryName}</Category>
-                <PaymentMethod>{capitalize(tr.paymentMethod)}</PaymentMethod>
-                <Amount type={tr.type}>
-                  {tr.type === "income" ? "+" : "-"} ₩
-                  {tr.amount.toLocaleString()}
+            txs.map((tx) => (
+              <ListItem key={tx.id}>
+                <Category>{capitalize(tx.categoryName)}</Category>
+                <PaymentMethod>{capitalize(tx.txMethod)}</PaymentMethod>
+                <Amount type={tx.txType}>
+                  {tx.txType === "income" ? "+" : "-"} ₩
+                  {tx.amount.toLocaleString()}
                 </Amount>
               </ListItem>
             ))
