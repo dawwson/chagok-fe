@@ -19,40 +19,82 @@ const Calendar = ({ selectedDate, onChange }: Props) => {
           width: "100%",
           height: "100%",
           overflow: "visible",
+
           // 헤더
           "& .MuiPickersCalendarHeader-root": {
-            paddingLeft: "40px",
-            paddingRight: "28px",
+            minWidth: "4vw",
+            padding: "0px",
             marginBottom: "20px",
+
+            // 연도/월
+            "& .MuiPickersCalendarHeader-labelContainer": {
+              marginLeft: "5vw",
+              fontSize: "20px",
+            },
+
+            // 좌우 화살표
+            "& .MuiPickersArrowSwitcher-root": {
+              marginRight: "4vw",
+            },
           },
+
+          // 요일&날짜 영역
+          "& .MuiDayCalendar-root": {},
+
           // 요일
           "& .MuiDayCalendar-header": {
-            height: "50px",
-            justifyContent: "center",
-            gap: "12px",
             "& span": {
+              minWidth: "4vw",
+              minHeight: "4vh",
               fontSize: "14px",
             },
           },
+
           // 날짜 영역
           "& .MuiPickersSlideTransition-root": {
-            width: "100%",
-            minHeight: "300px",
+            minHeight: "44vh",
             marginTop: "10px",
           },
+
           // 날짜 셀
           "& .MuiPickersDay-root": {
-            minHeight: "48px",
-            minWidth: "48px",
+            minWidth: "4vw",
+            minHeight: "4vw",
             fontSize: "18px",
+
             "&:hover": {
               backgroundColor: "#E6E6E6",
             },
+
             // 선택된 날짜 셀
             "&.Mui-selected": {
               backgroundColor: "#0D99FF",
+
               "&:focus": {
                 backgroundColor: "#0D99FF",
+              },
+            },
+          },
+
+          // 연도 선택 영역
+          "& .MuiYearCalendar-root": {
+            // backgroundColor: "pink",
+            width: "100%",
+            maxHeight: "50vh",
+
+            // 연도 버튼
+            "& .MuiPickersYear-yearButton": {
+              "&:hover": {
+                backgroundColor: "#E6E6E6",
+              },
+
+              // 선택된 연도
+              "&.Mui-selected": {
+                backgroundColor: "#0D99FF",
+
+                "&:focus": {
+                  backgroundColor: "#0D99FF",
+                },
               },
             },
           },
