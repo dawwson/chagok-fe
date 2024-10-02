@@ -4,7 +4,13 @@ interface Props {
 
 const AuthLayout = ({ children }: Props) => {
   return (
-    <div style={{ height: "100vh", display: "flex", justifyContent: "center" }}>
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
       {children}
     </div>
   );
