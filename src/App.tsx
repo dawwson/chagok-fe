@@ -8,7 +8,7 @@ import MainLayout from "./components/templates/MainLayout";
 import PrivateRoute from "./components/templates/PrivateRoute";
 
 import HomePage from "./pages/HomePage";
-import AddTransactionPage from "./pages/AddTransactionPage";
+import ManageTransactionPage from "./pages/ManageTransactionPage";
 import ProfilePage from "./pages/ProfilePage";
 import ManageBudgetPage from "./pages/ManageBudgetPage";
 import StatsPage from "./pages/StatsPage";
@@ -46,7 +46,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/add-transaction",
-        element: <AddTransactionPage />,
+        element: <ManageTransactionPage />,
       },
       {
         path: "/manage-budget",
