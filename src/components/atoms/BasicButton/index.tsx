@@ -1,5 +1,7 @@
 import * as S from "./style";
 
+// NOTE: 감싸서 사용하기
+
 type ButtonSize = "small" | "large";
 type ButtonType = "confirm" | "cancel" | "danger";
 
