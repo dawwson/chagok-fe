@@ -8,7 +8,7 @@ import { useAuth } from "../../contexts/auth";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { signIn, currentUser } = useAuth();
+  const { authenticate, currentUser } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -35,7 +35,7 @@ const LoginPage = () => {
     try {
       setIsLoading(true);
       const userInfo = await signInWithEmailAndPassword(email, password);
-      signIn(userInfo);
+      authenticate(userInfo);
       navigate("/", { replace: true });
     } catch (error) {
       if (error instanceof ApiError) {

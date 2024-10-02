@@ -1,5 +1,5 @@
 const AddEntryPage = () => {
-  return <h1>add entry</h1>;
+  return <h1>add transaction</h1>;
 };
 
 export default AddEntryPage;

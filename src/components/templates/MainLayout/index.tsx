@@ -1,9 +1,30 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+
 import * as S from "./style";
+import { signOut } from "../../../apis/auth";
+import { useAuth } from "../../../contexts/auth";
+import { ApiError } from "../../../types/errorTypes";
 
 const MainLayout = () => {
-  const handleClickLogout = () => {
-    // TODO: 로그아웃 로직
+  const navigate = useNavigate();
+  const { deauthenticate } = useAuth();
+
+  const handleClickLogout = async () => {
+    const ok = confirm("정말 로그아웃 하시겠습니까?"); // TODO: 모달로 변경
+    if (ok) {
+      try {
+        await signOut();
+        deauthenticate();
+        navigate("/login", { replace: true });
+      } catch (error) {
+        if (error instanceof ApiError) {
+          if (error.errorCode === "AUTH_INVALID_TOKEN") {
+            deauthenticate();
+            navigate("/login", { replace: true });
+          }
+        }
+      }
+    }
   };
 
   const handleClickMore = () => {

@@ -1,62 +1,49 @@
-import axios from "axios";
-import { ApiError } from "../types/errorTypes";
 import axiosInstance from "./axiosInstance";
 
 const API_URL = "/auth";
 
-export const signInWithEmailAndPassword = async (
-  email: string,
-  password: string
-) => {
-  try {
-    const response = await axiosInstance.post(
-      `${API_URL}/sign-in`,
-      { email, password },
-      { withCredentials: true }
-    );
+interface SignUpResponse {
+  id: string;
+  email: string;
+  nickname: string;
+}
 
-    const { data } = response.data;
-    return data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      const { path, errorCode, detail, timestamp } = error.response.data;
-      throw new ApiError(path, errorCode, detail, timestamp);
-    }
-    throw new Error(`Error: ${API_URL}/sign-in`);
-  }
-};
-
+// 회원가입
 export const signUpWithEmailAndPassword = async (
   email: string,
   password: string,
   nickname: string
 ) => {
-  try {
-    const response = await axiosInstance.post(
-      `${API_URL}/sign-up`,
-      { email, password, nickname },
-      { withCredentials: true }
-    );
+  const response = (await axiosInstance.post(`${API_URL}/sign-up`, {
+    email,
+    password,
+    nickname,
+  })) as unknown as SignUpResponse;
 
-    const { data } = response.data;
-    return data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      const { path, errorCode, detail, timestamp } = error.response.data;
-      throw new ApiError(path, errorCode, detail, timestamp);
-    }
-    throw new Error(`Error: ${API_URL}/sign-up`);
-  }
+  return response;
 };
 
-/*
-// 로그아웃 API 요청
-export const logout = async () => {
-  const response = await axiosInstance.post(
-    `${API_URL}/logout`,
-    {},
-    { withCredentials: true }
-  );
-  return response.data;
+interface SignInResponse {
+  id: string;
+  nickname: string;
+}
+
+// 로그인
+export const signInWithEmailAndPassword = async (
+  email: string,
+  password: string
+) => {
+  const response = (await axiosInstance.post(`${API_URL}/sign-in`, {
+    email,
+    password,
+  })) as unknown as SignInResponse;
+
+  return response;
 };
-*/
+
+// 로그아웃
+export const signOut = async () => {
+  await axiosInstance.post(`${API_URL}/sign-out`);
+};
+
+// TODO: 회원 탈퇴
