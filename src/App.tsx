@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import reset from "styled-reset";
 
 import { lightTheme } from "./configs/theme";
 import { AuthProvider } from "./contexts/auth";
-import LoadingScreen from "./components/organisms/LoadingScreen";
 import MainLayout from "./components/templates/MainLayout";
 import PrivateRoute from "./components/templates/PrivateRoute";
 
@@ -19,21 +17,11 @@ import JoinPage from "./pages/JoinPage";
 import AuthLayout from "./components/templates/AuthLayout";
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  const checkAuth = async () => {
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
   return (
     <AuthProvider>
       <ThemeProvider theme={lightTheme}>
         <GlobalStyles />
-        {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
+        <RouterProvider router={router} />
       </ThemeProvider>
     </AuthProvider>
   );
