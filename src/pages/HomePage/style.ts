@@ -19,6 +19,7 @@ export const LeftWrapper = styled.div`
 
 export const CalendarContainer = styled.div`
   height: 100%;
+  min-height: fit-content;
   background-color: ${({ theme }) => theme.background.white};
   border-radius: 20px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);

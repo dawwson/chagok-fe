@@ -18,7 +18,8 @@ const Calendar = ({ selectedDate, onChange }: Props) => {
         sx={{
           width: "100%",
           height: "100%",
-          overflow: "visible",
+          minHeight: "fit-content",
+          overflow: "scroll",
 
           // 헤더
           "& .MuiPickersCalendarHeader-root": {
@@ -43,6 +44,8 @@ const Calendar = ({ selectedDate, onChange }: Props) => {
 
           // 요일
           "& .MuiDayCalendar-header": {
+            marginTop: "2vh",
+
             "& span": {
               minWidth: "4vw",
               minHeight: "4vh",
@@ -53,7 +56,7 @@ const Calendar = ({ selectedDate, onChange }: Props) => {
           // 날짜 영역
           "& .MuiPickersSlideTransition-root": {
             minHeight: "44vh",
-            marginTop: "10px",
+            marginTop: "2vh",
           },
 
           // 날짜 셀
