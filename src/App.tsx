@@ -45,7 +45,7 @@ const router = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
-        path: "/add-transaction",
+        path: "/manage-transaction",
         element: <ManageTransactionPage />,
       },
       {
