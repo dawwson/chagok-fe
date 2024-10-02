@@ -37,6 +37,7 @@ export const ButtonContainer = styled.div`
   height: 40px;
   background-color: ${({ theme }) => theme.background.light_blue};
   margin-bottom: 44px;
+  padding-right: 20px;
 `;
 
 export const AddButton = styled.button`
@@ -48,7 +49,7 @@ export const AddButton = styled.button`
   background-color: ${({ theme }) => theme.button.primary};
   border-radius: 50px;
   border: none;
-  margin-bottom: 44px;
+  margin: 0px 0px 44px 4px;
   cursor: pointer;
 
   &:hover {
@@ -58,6 +59,7 @@ export const AddButton = styled.button`
 
 export const ListItemContainer = styled.div`
   overflow-y: auto;
+  padding-right: 20px;
 `;
 
 export const ListItem = styled.div`
@@ -68,9 +70,14 @@ export const ListItem = styled.div`
   border-radius: 20px;
   background-color: ${({ theme }) => theme.background.white};
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
   padding: 0 20px;
+  margin: 0px 0px 20px 4px;
   font-size: 14px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.button.secondary};
+  }
 `;
 
 export const Category = styled.div`

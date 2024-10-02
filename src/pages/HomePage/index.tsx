@@ -64,13 +64,17 @@ const HomePage = () => {
     }
   }, []);
 
-  const handleOnClickAdd = () => {
-    navigate("/manage-transaction");
-  };
-
   const handleChangeDate = async (date: Dayjs) => {
     fetchData(date);
     saveSelectedDate(date.toISOString());
+  };
+
+  const handleClickAdd = () => {
+    navigate("/manage-transaction");
+  };
+
+  const handleClickListItem = (txId: number) => {
+    navigate("/manage-transaction", { state: { txId } });
   };
 
   useEffect(() => {
@@ -94,16 +98,17 @@ const HomePage = () => {
       </S.LeftWrapper>
       <S.RightWrapper>
         <S.ButtonContainer>
-          <S.AddButton onClick={handleOnClickAdd}>
-            Add a transaction
-          </S.AddButton>
+          <S.AddButton onClick={handleClickAdd}>Add a transaction</S.AddButton>
         </S.ButtonContainer>
         <S.ListItemContainer>
           {txs.length === 0 ? (
             <S.Empty>Try to add a new transaction!</S.Empty>
           ) : (
             txs.map((tx) => (
-              <S.ListItem key={tx.id}>
+              <S.ListItem
+                key={tx.id}
+                onClick={() => handleClickListItem(tx.id)}
+              >
                 <S.Category>{capitalize(tx.categoryName)}</S.Category>
                 <S.PaymentMethod>{capitalize(tx.txMethod)}</S.PaymentMethod>
                 <S.Amount type={tx.txType}>
