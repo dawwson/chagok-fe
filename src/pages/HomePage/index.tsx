@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -30,30 +30,30 @@ interface Tx {
 }
 
 const HomePage = () => {
+  const initialDate = getSelectedDate();
   const navigate = useNavigate();
   const { currentUser, deauthenticate } = useAuth();
 
-  const initialDate = getSelectedDate();
   const [selectedDate, setSelectedDate] = useState(
     dayjs(initialDate ?? undefined)
   );
   const [sum, setSum] = useState<Sum | null>(null);
   const [txs, setTxs] = useState<Tx[]>([]);
 
-  const handleOnClickAdd = () => {
-    navigate("/add-transaction");
-  };
-
-  const handleOnChangeDate = async (date: Dayjs) => {
-    const startDate = date.startOf("day").toISOString();
-    const endDate = date.endOf("day").toISOString();
+  const fetchData = useCallback(async (date: Dayjs) => {
+    const startOfMonth = date.startOf("month").toISOString();
+    const endOfMonth = date.endOf("month").toISOString();
+    const startOfDay = date.startOf("day").toISOString();
+    const endOfDay = date.endOf("day").toISOString();
 
     try {
-      const txs = await getTxs(startDate, endDate);
-
-      setTxs(txs);
+      const [sum, txs] = await Promise.all([
+        getTxSum(startOfMonth, endOfMonth),
+        getTxs(startOfDay, endOfDay),
+      ]);
       setSelectedDate(date);
-      saveSelectedDate(date.toISOString());
+      setSum(sum);
+      setTxs(txs);
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.errorCode === "AUTH_INVALID_TOKEN") {
@@ -62,37 +62,20 @@ const HomePage = () => {
         }
       }
     }
+  }, []);
+
+  const handleOnClickAdd = () => {
+    navigate("/manage-transaction");
+  };
+
+  const handleChangeDate = async (date: Dayjs) => {
+    fetchData(date);
+    saveSelectedDate(date.toISOString());
   };
 
   useEffect(() => {
-    if (!currentUser) {
-      navigate("/login");
-    }
-  }, [currentUser, navigate]);
-
-  useEffect(() => {
-    const fetchSum = async () => {
-      const startDate = selectedDate.startOf("month").toISOString();
-      const endDate = selectedDate.endOf("month").toISOString();
-
-      try {
-        const { totalIncome, totalExpense } = await getTxSum(
-          startDate,
-          endDate
-        );
-        setSum({ totalIncome, totalExpense });
-      } catch (error) {
-        if (error instanceof ApiError) {
-          if (error.errorCode === "AUTH_INVALID_TOKEN") {
-            deauthenticate();
-            navigate("/login", { replace: true });
-          }
-        }
-      }
-    };
-
-    fetchSum();
-  }, [selectedDate, deauthenticate, navigate]);
+    fetchData(selectedDate);
+  }, [fetchData]);
 
   return (
     <S.Wrapper>
@@ -106,7 +89,7 @@ const HomePage = () => {
           }`}
         />
         <S.CalendarContainer>
-          <Calendar selectedDate={selectedDate} onChange={handleOnChangeDate} />
+          <Calendar selectedDate={selectedDate} onChange={handleChangeDate} />
         </S.CalendarContainer>
       </S.LeftWrapper>
       <S.RightWrapper>
