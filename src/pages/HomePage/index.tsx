@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
 import dayjs, { Dayjs } from "dayjs";
+
+import * as S from "./style";
+import { getSelectedDate, saveSelectedDate } from "./util";
 
 import { getTxs, getTxSum } from "../../apis/tx";
 import Calendar from "../../components/organisms/Calendar";
+import Header from "../../components/organisms/Header";
 import { useAuth } from "../../contexts/auth";
 import { capitalize } from "../../utils/string";
+import { ApiError } from "../../types/errorTypes";
 
 type TxType = "income" | "expense";
 type TxMethod = "cash" | "debit card" | "credit card" | "bank transfer";
@@ -26,10 +30,13 @@ interface Tx {
 }
 
 const HomePage = () => {
-  const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const { currentUser, deauthenticate } = useAuth();
 
-  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const initialDate = getSelectedDate();
+  const [selectedDate, setSelectedDate] = useState(
+    dayjs(initialDate ?? undefined)
+  );
   const [sum, setSum] = useState<Sum | null>(null);
   const [txs, setTxs] = useState<Tx[]>([]);
 
@@ -41,9 +48,20 @@ const HomePage = () => {
     const startDate = date.startOf("day").toISOString();
     const endDate = date.endOf("day").toISOString();
 
-    const txs = await getTxs(startDate, endDate);
-    setTxs(txs);
-    setSelectedDate(date);
+    try {
+      const txs = await getTxs(startDate, endDate);
+
+      setTxs(txs);
+      setSelectedDate(date);
+      saveSelectedDate(date.toISOString());
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.errorCode === "AUTH_INVALID_TOKEN") {
+          deauthenticate();
+          navigate("/login", { replace: true });
+        }
+      }
+    }
   };
 
   useEffect(() => {
@@ -57,156 +75,65 @@ const HomePage = () => {
       const startDate = selectedDate.startOf("month").toISOString();
       const endDate = selectedDate.endOf("month").toISOString();
 
-      const { totalIncome, totalExpense } = await getTxSum(startDate, endDate);
-      setSum({ totalIncome, totalExpense });
+      try {
+        const { totalIncome, totalExpense } = await getTxSum(
+          startDate,
+          endDate
+        );
+        setSum({ totalIncome, totalExpense });
+      } catch (error) {
+        if (error instanceof ApiError) {
+          if (error.errorCode === "AUTH_INVALID_TOKEN") {
+            deauthenticate();
+            navigate("/login", { replace: true });
+          }
+        }
+      }
     };
 
     fetchSum();
-  }, [selectedDate]);
+  }, [selectedDate, deauthenticate, navigate]);
 
   return (
-    <Wrapper>
-      <LeftWrapper>
-        <Title>Welcome to Chagok, {currentUser?.nickname}!</Title>
-        <Description>
-          🔖 Income : &nbsp;₩{sum?.totalIncome.toLocaleString() ?? 0} &nbsp;
-          Expense : ₩{sum?.totalExpense.toLocaleString() ?? 0}
-        </Description>
-        <CalendarContainer>
+    <S.Wrapper>
+      <S.LeftWrapper>
+        <Header
+          title={`Welcome to Chagok, ${currentUser?.nickname}!`}
+          description={`🔖 Income : ${"\u00A0"}₩${
+            sum?.totalIncome.toLocaleString() ?? 0
+          }${"\u00A0\u00A0\u00A0"}Expense : ₩${
+            sum?.totalExpense.toLocaleString() ?? 0
+          }`}
+        />
+        <S.CalendarContainer>
           <Calendar selectedDate={selectedDate} onChange={handleOnChangeDate} />
-        </CalendarContainer>
-      </LeftWrapper>
-      <RightWrapper>
-        <ButtonContainer>
-          <Button onClick={handleOnClickAdd}>Add a transaction</Button>
-        </ButtonContainer>
-        <ListItemContainer>
+        </S.CalendarContainer>
+      </S.LeftWrapper>
+      <S.RightWrapper>
+        <S.ButtonContainer>
+          <S.AddButton onClick={handleOnClickAdd}>
+            Add a transaction
+          </S.AddButton>
+        </S.ButtonContainer>
+        <S.ListItemContainer>
           {txs.length === 0 ? (
-            <Empty>Try to add a new transaction!</Empty>
+            <S.Empty>Try to add a new transaction!</S.Empty>
           ) : (
             txs.map((tx) => (
-              <ListItem key={tx.id}>
-                <Category>{capitalize(tx.categoryName)}</Category>
-                <PaymentMethod>{capitalize(tx.txMethod)}</PaymentMethod>
-                <Amount type={tx.txType}>
+              <S.ListItem key={tx.id}>
+                <S.Category>{capitalize(tx.categoryName)}</S.Category>
+                <S.PaymentMethod>{capitalize(tx.txMethod)}</S.PaymentMethod>
+                <S.Amount type={tx.txType}>
                   {tx.txType === "income" ? "+" : "-"} ₩
                   {tx.amount.toLocaleString()}
-                </Amount>
-              </ListItem>
+                </S.Amount>
+              </S.ListItem>
             ))
           )}
-        </ListItemContainer>
-      </RightWrapper>
-    </Wrapper>
+        </S.ListItemContainer>
+      </S.RightWrapper>
+    </S.Wrapper>
   );
 };
 
 export default HomePage;
-
-// TODO: 스타일 파일로 이동
-export const Wrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  padding-left: 30px;
-  display: flex;
-  gap: 30px;
-`;
-
-export const LeftWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  gap: 20px;
-`;
-
-export const Title = styled.h1`
-  color: ${({ theme }) => theme.text.accent};
-  font-size: 28px;
-  font-weight: 600;
-`;
-
-export const Description = styled.p`
-  color: ${({ theme }) => theme.text.secondary};
-  font-size: 16px;
-  font-weight: 400;
-`;
-
-export const CalendarContainer = styled.div`
-  height: 100%;
-  background-color: ${({ theme }) => theme.background.white};
-  border-radius: 20px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-`;
-
-export const RightWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-
-export const ButtonContainer = styled.div`
-  height: 40px;
-  background-color: ${({ theme }) => theme.background.light_blue};
-  margin-bottom: 44px;
-`;
-
-export const Button = styled.button`
-  width: 100%;
-  height: 40px;
-  color: ${({ theme }) => theme.buttonText.primary};
-  font-size: 16px;
-  font-weight: 600;
-  background-color: ${({ theme }) => theme.button.primary};
-  border-radius: 50px;
-  border: none;
-  margin-bottom: 44px;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-
-export const ListItemContainer = styled.div`
-  overflow-y: auto;
-`;
-
-export const ListItem = styled.div`
-  width: 100%;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  border-radius: 20px;
-  background-color: ${({ theme }) => theme.background.white};
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  padding: 0 20px;
-  font-size: 14px;
-`;
-
-export const Category = styled.div`
-  flex: 1;
-  color: ${({ theme }) => theme.text.primary};
-`;
-
-export const PaymentMethod = styled.div`
-  flex: 1;
-  color: ${({ theme }) => theme.text.secondary};
-`;
-
-export const Amount = styled.div<{ type: "income" | "expense" }>`
-  flex: 1;
-  color: ${({ type, theme }) =>
-    type === "income" ? theme.text.accent : theme.text.danger};
-  text-align: right;
-`;
-
-export const Empty = styled.div`
-  text-align: center;
-  margin-top: 180px;
-  color: ${({ theme }) => theme.text.secondary};
-`;
