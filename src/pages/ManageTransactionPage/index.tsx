@@ -1,11 +1,14 @@
-import { useLocation } from "react-router-dom";
-import Header from "../../components/organisms/Header";
-import { styled } from "styled-components";
-import ChipButton from "../../components/atoms/ChipButton";
 import { useState } from "react";
-import { capitalize } from "../../utils/string";
-import StyledCheckbox from "../../components/atoms/StyledCheckbox";
+import { useLocation } from "react-router-dom";
+import { styled } from "styled-components";
+
 import BasicButton from "../../components/atoms/BasicButton";
+import ChipButton from "../../components/atoms/ChipButton";
+import StyledCheckbox from "../../components/atoms/StyledCheckbox";
+import Header from "../../components/organisms/Header";
+
+import { capitalize } from "../../utils/string";
+import { localize } from "../../utils/date";
 
 // TODO: input 컴포넌트 분리
 // TODO: API 연동
@@ -19,20 +22,32 @@ interface Category {
   type: TxType;
 }
 
+interface HomeState {
+  txId?: number;
+  selectedDate?: string;
+}
+
+const DEFAULT_INCOME_CATEGORY_ID = 1;
+const DEFAULT_EXPENSE_CATEGORY_ID = 5;
+
 const ManageTransactionPage = () => {
   const location = useLocation();
-  const { txId, date } = location.state || {};
+  const { txId, selectedDate } = (location.state as HomeState) || {};
+
+  const isEditPage = !!txId;
+  const isAddPage = !!selectedDate;
 
   const [tx, setTx] = useState({
+    id: 1,
     txType: "income",
     txMethod: "cash",
     categoryId: 1,
     amount: 0,
-    description: "",
-    date,
+    description: "테스트",
+    date: "2024-09-30T04:22:17.531Z",
     isExcluded: false,
   });
-  const [cagegories, setCategories] = useState<Category[]>([
+  const [categories, setCategories] = useState<Category[]>([
     { id: 1, name: "salary", type: "income" },
     { id: 2, name: "business", type: "income" },
     { id: 3, name: "investment", type: "income" },
@@ -55,6 +70,17 @@ const ManageTransactionPage = () => {
   ]);
 
   const handleSelectTxType = (txType: TxType) => {
+    if (tx.txType !== txType) {
+      setTx({
+        ...tx,
+        txType,
+        categoryId:
+          txType === "income"
+            ? DEFAULT_INCOME_CATEGORY_ID
+            : DEFAULT_EXPENSE_CATEGORY_ID,
+      });
+      return;
+    }
     setTx({ ...tx, txType });
   };
 
@@ -68,8 +94,19 @@ const ManageTransactionPage = () => {
 
   const handleChangeAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
-    // 1000 단위로 끊은 문자열을 number로 변환
-    setTx({ ...tx, amount: Number(value.replace(/[,]/g, "")) });
+
+    // 숫자 문자열 -> number
+    const formatted = Number(value.replace(/[,]/g, ""));
+    if (isNaN(formatted)) {
+      return;
+    }
+
+    if (formatted > 20000000000) {
+      setTx({ ...tx, amount: 20000000000 });
+      return;
+    }
+
+    setTx({ ...tx, amount: formatted });
   };
 
   const handleChangeDescription = (
@@ -87,14 +124,23 @@ const ManageTransactionPage = () => {
     console.log("delete");
   };
 
-  const renderCategories = () => {
-    return cagegories.map((category) => {
+  const renderDate = () => {
+    if (isAddPage) {
+      return localize(selectedDate);
+    }
+    if (isEditPage) {
+      return localize(tx.date);
+    }
+  };
+
+  const renderCategoryChips = () => {
+    return categories.map((category) => {
       if (category.type === tx.txType) {
         return (
           <ChipButton
             key={category.id}
             label={capitalize(category.name)}
-            selected={tx.categoryId === category.id}
+            selected={category.id === tx.categoryId}
             onClick={() => handleSelectCategory(category.id)}
           />
         );
@@ -106,10 +152,38 @@ const ManageTransactionPage = () => {
     <Wrapper>
       <LeftWrapper>
         <Header
-          title={txId ? "Edit a transaction" : "Add a transaction"}
+          title={isEditPage ? "Edit a transaction" : "Add a transaction"}
           description="Enter your income or expenses."
         />
-        <ResultContainer></ResultContainer>
+        <TransactionContainer>
+          <Date>{renderDate()}</Date>
+          <Type>{capitalize(tx.txType)}</Type>
+          <Amount>₩{tx.amount.toLocaleString()}</Amount>
+          <Category>
+            {capitalize(
+              categories.find(({ id }) => id === tx.categoryId)?.name ?? ""
+            )}
+          </Category>
+          <Description>
+            {`${capitalize(tx.txMethod)}${
+              tx.description ? ` - ${tx.description}` : ""
+            }`}
+          </Description>
+          <ButtonGroup>
+            <BasicButton
+              label="Cancel"
+              size="large"
+              type="cancel"
+              onClick={() => console.log("취소")}
+            />
+            <BasicButton
+              label="Add"
+              size="large"
+              type="confirm"
+              onClick={() => console.log("등록")}
+            />
+          </ButtonGroup>
+        </TransactionContainer>
       </LeftWrapper>
       <RightWrapper>
         <SelectorWrapper>
@@ -136,7 +210,7 @@ const ManageTransactionPage = () => {
               onClick={() => handleSelectTxMethod("cash")}
             />
             <ChipButton
-              label="Dedit Card"
+              label="Debit Card"
               selected={tx.txMethod === "debit card"}
               onClick={() => handleSelectTxMethod("debit card")}
             />
@@ -154,7 +228,7 @@ const ManageTransactionPage = () => {
         </SelectorWrapper>
         <SelectorWrapper>
           <SubTitle>Category</SubTitle>
-          <ChipGroup>{renderCategories()}</ChipGroup>
+          <ChipGroup>{renderCategoryChips()}</ChipGroup>
         </SelectorWrapper>
         <SelectorWrapper>
           <SubTitle>Amount</SubTitle>
@@ -169,6 +243,7 @@ const ManageTransactionPage = () => {
           <SubTitle>Description</SubTitle>
           <Input
             name="description"
+            value={tx.description}
             placeholder="This field is optional."
             onChange={handleChangeDescription}
           />
@@ -180,14 +255,16 @@ const ManageTransactionPage = () => {
             onChange={handleChangeCheckbox}
           />
         </SelectorWrapper>
-        <DeleteButtonWrapper>
-          <BasicButton
-            label="Delete"
-            type="danger"
-            size="large"
-            onClick={handleClickDelete}
-          />
-        </DeleteButtonWrapper>
+        {isEditPage && (
+          <DeleteButtonWrapper>
+            <BasicButton
+              label="Delete"
+              type="danger"
+              size="large"
+              onClick={handleClickDelete}
+            />
+          </DeleteButtonWrapper>
+        )}
       </RightWrapper>
     </Wrapper>
   );
@@ -212,13 +289,53 @@ export const LeftWrapper = styled.div`
   gap: 20px;
 `;
 
-export const ResultContainer = styled.div`
+export const TransactionContainer = styled.div`
   height: 100%;
-  min-height: fit-content;
+  display: flex;
+  flex-direction: column;
   background-color: ${({ theme }) => theme.background.white};
   border-radius: 20px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   padding: 30px;
+  text-align: center;
+  overflow-y: auto;
+`;
+
+export const Date = styled.h1`
+  color: ${({ theme }) => theme.text.secondary};
+  margin-top: 20px;
+  margin-bottom: 80px;
+`;
+
+export const Type = styled.h1`
+  color: ${({ theme }) => theme.text.accent};
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 500;
+`;
+
+export const Amount = styled.h1`
+  color: ${({ theme }) => theme.text.primary};
+  font-size: 50px;
+  margin-bottom: 50px;
+`;
+
+export const Category = styled.h1`
+  color: ${({ theme }) => theme.text.secondary};
+  font-size: 30px;
+  margin-bottom: 20px;
+`;
+
+export const Description = styled.h1`
+  color: ${({ theme }) => theme.text.secondary};
+  font-size: 18px;
+  margin-bottom: 100px;
+`;
+
+export const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 `;
 
 export const RightWrapper = styled.div`
