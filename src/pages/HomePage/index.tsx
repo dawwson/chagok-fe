@@ -70,7 +70,9 @@ const HomePage = () => {
   };
 
   const handleClickAdd = () => {
-    navigate("/manage-transaction");
+    navigate("/manage-transaction", {
+      state: { selectedDate: selectedDate.toISOString() },
+    });
   };
 
   const handleClickListItem = (txId: number) => {
