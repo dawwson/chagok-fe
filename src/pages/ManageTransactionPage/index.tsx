@@ -14,6 +14,8 @@ import LoadingScreen from "../../components/organisms/LoadingScreen";
 import { capitalize } from "../../utils/string";
 import { localize } from "../../utils/date";
 
+const DEFAULT_INCOME_CATEGORY_ID = 1;
+const DEFAULT_EXPENSE_CATEGORY_ID = 5;
 const MAT_AMOUNT = 20000000000;
 const MAX_DESCRIPTION_LENGTH = 100;
 
@@ -41,9 +43,6 @@ interface HomeState {
   txId?: number;
   selectedDate?: string;
 }
-
-const DEFAULT_INCOME_CATEGORY_ID = 1;
-const DEFAULT_EXPENSE_CATEGORY_ID = 5;
 
 const ManageTransactionPage = () => {
   const location = useLocation();
@@ -147,17 +146,17 @@ const ManageTransactionPage = () => {
     });
   };
 
-  const fetchData = async () => {
-    const categories = await getCategories();
-    setCategories(categories);
-
-    if (isEditPage) {
-      const txDetail = await getTxDetail(txId);
-      setTx(txDetail);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      const categories = await getCategories();
+      setCategories(categories);
+
+      if (isEditPage) {
+        const txDetail = await getTxDetail(txId);
+        setTx(txDetail);
+      }
+    };
+
     const timeoutId = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -167,7 +166,7 @@ const ManageTransactionPage = () => {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  if (isLoading) {
+  if (isEditPage && isLoading) {
     return <LoadingScreen />;
   }
 
