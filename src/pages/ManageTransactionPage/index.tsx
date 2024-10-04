@@ -1,17 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { styled } from "styled-components";
+
+import { getCategories } from "../../apis/category";
+import { getTxDetail } from "../../apis/tx";
 
 import BasicButton from "../../components/atoms/BasicButton";
 import ChipButton from "../../components/atoms/ChipButton";
 import StyledCheckbox from "../../components/atoms/StyledCheckbox";
 import Header from "../../components/organisms/Header";
+import LoadingScreen from "../../components/organisms/LoadingScreen";
 
 import { capitalize } from "../../utils/string";
 import { localize } from "../../utils/date";
 
-// TODO: input 컴포넌트 분리
-// TODO: API 연동
+const MAT_AMOUNT = 20000000000;
+const MAX_DESCRIPTION_LENGTH = 100;
 
 type TxType = "income" | "expense";
 type TxMethod = "cash" | "debit card" | "credit card" | "bank transfer";
@@ -20,6 +24,17 @@ interface Category {
   id: number;
   name: string;
   type: TxType;
+}
+
+interface Tx {
+  id?: number;
+  txType: TxType;
+  txMethod: TxMethod;
+  categoryId: number;
+  amount: number;
+  description: string;
+  date: string;
+  isExcluded: boolean;
 }
 
 interface HomeState {
@@ -37,37 +52,18 @@ const ManageTransactionPage = () => {
   const isEditPage = !!txId;
   const isAddPage = !!selectedDate;
 
-  const [tx, setTx] = useState({
-    id: 1,
+  const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [tx, setTx] = useState<Tx>({
+    id: txId,
     txType: "income",
     txMethod: "cash",
     categoryId: 1,
     amount: 0,
-    description: "테스트",
-    date: "2024-09-30T04:22:17.531Z",
+    description: "",
+    date: selectedDate ?? "",
     isExcluded: false,
   });
-  const [categories, setCategories] = useState<Category[]>([
-    { id: 1, name: "salary", type: "income" },
-    { id: 2, name: "business", type: "income" },
-    { id: 3, name: "investment", type: "income" },
-    { id: 4, name: "other income", type: "income" },
-    { id: 5, name: "food", type: "expense" },
-    { id: 6, name: "housing", type: "expense" },
-    { id: 7, name: "transportation", type: "expense" },
-    { id: 8, name: "healthcare", type: "expense" },
-    { id: 9, name: "communication", type: "expense" },
-    { id: 10, name: "education", type: "expense" },
-    { id: 11, name: "entertainment", type: "expense" },
-    { id: 12, name: "shopping", type: "expense" },
-    { id: 13, name: "household", type: "expense" },
-    { id: 14, name: "insurance", type: "expense" },
-    { id: 15, name: "tax", type: "expense" },
-    { id: 16, name: "pet", type: "expense" },
-    { id: 17, name: "subscription", type: "expense" },
-    { id: 18, name: "donation", type: "expense" },
-    { id: 19, name: "other expense", type: "expense" },
-  ]);
 
   const handleSelectTxType = (txType: TxType) => {
     if (tx.txType !== txType) {
@@ -101,8 +97,8 @@ const ManageTransactionPage = () => {
       return;
     }
 
-    if (formatted > 20000000000) {
-      setTx({ ...tx, amount: 20000000000 });
+    if (formatted > MAT_AMOUNT) {
+      setTx({ ...tx, amount: MAT_AMOUNT });
       return;
     }
 
@@ -113,6 +109,9 @@ const ManageTransactionPage = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { value } = event.target;
+    if (value.length > MAX_DESCRIPTION_LENGTH) {
+      return;
+    }
     setTx({ ...tx, description: value });
   };
 
@@ -148,6 +147,30 @@ const ManageTransactionPage = () => {
     });
   };
 
+  const fetchData = async () => {
+    const categories = await getCategories();
+    setCategories(categories);
+
+    if (isEditPage) {
+      const txDetail = await getTxDetail(txId);
+      setTx(txDetail);
+    }
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    fetchData();
+
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <Wrapper>
       <LeftWrapper>
@@ -177,7 +200,7 @@ const ManageTransactionPage = () => {
               onClick={() => console.log("취소")}
             />
             <BasicButton
-              label="Add"
+              label={isAddPage ? "Add" : "Update"}
               size="large"
               type="confirm"
               onClick={() => console.log("등록")}
@@ -235,7 +258,6 @@ const ManageTransactionPage = () => {
           <Input
             name="amount"
             value={tx.amount.toLocaleString()}
-            placeholder="Please enter numbers only."
             onChange={handleChangeAmount}
           />
         </SelectorWrapper>
@@ -330,6 +352,7 @@ export const Description = styled.h1`
   color: ${({ theme }) => theme.text.secondary};
   font-size: 18px;
   margin-bottom: 100px;
+  max-width: 100%;
 `;
 
 export const ButtonGroup = styled.div`

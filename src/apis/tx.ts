@@ -36,3 +36,19 @@ export const getTxs = async (startDate: string, endDate: string) => {
 
   return response as unknown as GetTxsResponse[];
 };
+
+interface GetTxDetailResponse {
+  id: number;
+  categoryId: number;
+  txType: TxType;
+  txMethod: TxMethod;
+  amount: number;
+  date: string;
+  description: string;
+  isExcluded: boolean;
+}
+
+export const getTxDetail = async (txId: number) => {
+  const response = await axiosInstance.get(`${API_URL}/${txId}`);
+  return response as unknown as GetTxDetailResponse;
+};
