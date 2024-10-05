@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import * as S from "./style";
 import { getCategories } from "../../apis/category";
-import { getTxDetail } from "../../apis/tx";
+import { createTx, getTxDetail, updateTx } from "../../apis/tx";
 
 import BasicButton from "../../components/atoms/BasicButton";
 import ChipButton from "../../components/atoms/ChipButton";
@@ -13,6 +13,7 @@ import LoadingScreen from "../../components/organisms/LoadingScreen";
 
 import { capitalize } from "../../utils/string";
 import { localize } from "../../utils/date";
+import { ApiError } from "../../types/errorTypes";
 
 const DEFAULT_INCOME_CATEGORY_ID = 1;
 const DEFAULT_EXPENSE_CATEGORY_ID = 5;
@@ -45,6 +46,7 @@ interface HomeState {
 }
 
 const ManageTransactionPage = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { txId, selectedDate } = (location.state as HomeState) || {};
 
@@ -116,6 +118,33 @@ const ManageTransactionPage = () => {
 
   const handleChangeCheckbox = () => {
     setTx({ ...tx, isExcluded: !tx.isExcluded });
+  };
+
+  const handleClickCancel = () => {
+    // TODO: 모달로 변경
+  };
+
+  const handleClickAddOrUpdate = async () => {
+    try {
+      if (isAddPage) {
+        await createTx(tx);
+      }
+      if (isEditPage) {
+        await updateTx({ id: txId, ...tx });
+      }
+    } catch (error) {
+      if (error instanceof ApiError) {
+        // TODO: 모달로 변경
+        if (error.errorCode === "CATEGORY_NOT_FOUND") {
+          console.log(error.detail);
+        }
+        if (error.errorCode === "TX_FORBIDDEN") {
+          console.log(error.detail);
+        }
+      }
+    } finally {
+      navigate("/", { replace: true });
+    }
   };
 
   const handleClickDelete = () => {
@@ -202,7 +231,7 @@ const ManageTransactionPage = () => {
               label={isAddPage ? "Add" : "Update"}
               size="large"
               type="confirm"
-              onClick={() => console.log("등록")}
+              onClick={handleClickAddOrUpdate}
             />
           </S.ButtonGroup>
         </S.TransactionContainer>

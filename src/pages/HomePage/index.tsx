@@ -72,11 +72,12 @@ const HomePage = () => {
   const handleClickAdd = () => {
     navigate("/manage-transaction", {
       state: { selectedDate: selectedDate.toISOString() },
+      replace: true,
     });
   };
 
   const handleClickListItem = (txId: number) => {
-    navigate("/manage-transaction", { state: { txId } });
+    navigate("/manage-transaction", { state: { txId }, replace: true });
   };
 
   useEffect(() => {
