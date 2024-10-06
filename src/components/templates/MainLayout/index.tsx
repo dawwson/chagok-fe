@@ -1,28 +1,27 @@
+import { useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
 import * as S from "./style";
+import Modal from "../../organisms/Modal";
 import { signOut } from "../../../apis/auth";
 import { useAuth } from "../../../contexts/auth";
+import { useError } from "../../../contexts/error";
 import { ApiError } from "../../../types/errorTypes";
 
 const MainLayout = () => {
   const navigate = useNavigate();
   const { deauthenticate } = useAuth();
+  const { handleApiError } = useError();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleClickLogout = async () => {
-    const ok = confirm("정말 로그아웃 하시겠습니까?"); // TODO: 모달로 변경
-    if (ok) {
-      try {
-        await signOut();
-        deauthenticate();
-        navigate("/login", { replace: true });
-      } catch (error) {
-        if (error instanceof ApiError) {
-          if (error.errorCode === "AUTH_INVALID_TOKEN") {
-            deauthenticate();
-            navigate("/login", { replace: true });
-          }
-        }
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      deauthenticate();
+      navigate("/login", { replace: true });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        handleApiError(error, navigate);
       }
     }
   };
@@ -104,7 +103,7 @@ const MainLayout = () => {
                 </svg>
               </S.MenuItem>
             </Link>
-            <S.MenuItem className="logout" onClick={handleClickLogout}>
+            <S.MenuItem className="logout" onClick={() => setIsOpen(true)}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -140,6 +139,25 @@ const MainLayout = () => {
           <Outlet />
         </S.RightWrapper>
       </S.Container>
+      {isOpen && (
+        <Modal
+          type="success"
+          buttons={[
+            {
+              label: "Cancel",
+              location: "left",
+              onClick: () => setIsOpen(false),
+            },
+            {
+              label: "Log out",
+              location: "right",
+              onClick: handleLogout,
+            },
+          ]}
+        >
+          <p style={{ lineHeight: "1.5" }}>Are you sure you want to log out?</p>
+        </Modal>
+      )}
     </>
   );
 };

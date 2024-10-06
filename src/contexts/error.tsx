@@ -1,6 +1,7 @@
 import { createContext, useState, useContext } from "react";
 import { NavigateFunction } from "react-router-dom";
 
+import { useAuth } from "./auth";
 import Modal from "../components/organisms/Modal";
 import { ApiError } from "../types/errorTypes";
 
@@ -20,11 +21,9 @@ export const useError = () => useContext(ErrorContext);
 
 export const ErrorProvider = ({ children }: Props) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { deauthenticate } = useAuth();
 
-  const handleApiError = (
-    error: ApiError,
-    navigateFn?: (to: string) => void
-  ) => {
+  const handleApiError = (error: ApiError, navigateFn?: NavigateFunction) => {
     const { errorCode } = error;
 
     switch (errorCode) {
@@ -33,6 +32,10 @@ export const ErrorProvider = ({ children }: Props) => {
         setErrorMessage("Please enter the amount.");
         break;
       // 401
+      case "AUTH_INVALID_TOKEN":
+        deauthenticate();
+        navigateFn?.("/login", { replace: true });
+        break;
       case "USER_EMAIL_DO_NOT_EXIST":
         setErrorMessage(
           "The email address you entered doesn't match any account."
