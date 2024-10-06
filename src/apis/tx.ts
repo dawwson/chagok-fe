@@ -1,4 +1,4 @@
-import axiosInstance from "./axiosInstance";
+import axios from "./axiosInstance";
 
 const API_URL = "/txs";
 
@@ -66,7 +66,7 @@ export const createTx = async (tx: {
   description: string;
   isExcluded: boolean;
 }) => {
-  const response = await axiosInstance.post(`${API_URL}`, tx);
+  const response = await axios.post(`${API_URL}`, tx);
 
   return response as unknown as CreateTxResponse;
 };
@@ -84,7 +84,7 @@ export const updateTx = async (tx: {
   isExcluded: boolean;
 }) => {
   const { id, ...body } = tx;
-  const response = await axiosInstance.put(`${API_URL}/${id}`, body);
+  const response = await axios.put(`${API_URL}/${id}`, body);
 
   return response as unknown as UpdateTxResponse;
 };
@@ -93,7 +93,7 @@ export const updateTx = async (tx: {
  * 내역 합계 조회
  */
 export const getTxSum = async (startDate: string, endDate: string) => {
-  const response = await axiosInstance.get(`${API_URL}/sum`, {
+  const response = await axios.get(`${API_URL}/sum`, {
     params: { startDate, endDate },
   });
 
@@ -104,7 +104,7 @@ export const getTxSum = async (startDate: string, endDate: string) => {
  * 내역 목록 조회
  */
 export const getTxs = async (startDate: string, endDate: string) => {
-  const response = await axiosInstance.get(`${API_URL}`, {
+  const response = await axios.get(`${API_URL}`, {
     params: { startDate, endDate },
   });
 
@@ -115,6 +115,14 @@ export const getTxs = async (startDate: string, endDate: string) => {
  * 내역 상세 조회
  */
 export const getTxDetail = async (txId: number) => {
-  const response = await axiosInstance.get(`${API_URL}/${txId}`);
+  const response = await axios.get(`${API_URL}/${txId}`);
   return response as unknown as GetTxDetailResponse;
+};
+
+/**
+ * 내역 삭제
+ */
+export const deleteTx = async (txId: number) => {
+  await axios.delete(`${API_URL}/${txId}`);
+  return;
 };

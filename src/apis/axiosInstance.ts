@@ -16,12 +16,11 @@ const onSuccess = (res: AxiosResponse) => {
 const onFail = (error: unknown) => {
   if (isAxiosError(error) && error.response) {
     const { path, errorCode, detail, timestamp } = error.response.data;
-    // 커스텀 에러 형식으로 변환한다.
-    return Promise.reject(new ApiError(path, errorCode, detail, timestamp));
+
+    return Promise.reject(new ApiError(path, errorCode, detail, timestamp)); // 커스텀 에러 형식으로 변환
   }
   return Promise.reject(error);
 };
-
 axiosInstance.interceptors.response.use(onSuccess, onFail);
 
 export default axiosInstance;
