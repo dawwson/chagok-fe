@@ -189,17 +189,17 @@ const ManageTransactionPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const categories = await getCategories();
-      setCategories(categories);
+      try {
+        const categories = await getCategories();
+        setCategories(categories);
 
-      if (isEditPage) {
-        try {
+        if (isEditPage) {
           const txDetail = await getTxDetail(txId);
           setTx(txDetail);
-        } catch (error) {
-          if (error instanceof ApiError) {
-            handleApiError(error, navigate);
-          }
+        }
+      } catch (error) {
+        if (error instanceof ApiError) {
+          handleApiError(error, navigate);
         }
       }
     };

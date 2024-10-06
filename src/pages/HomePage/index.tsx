@@ -6,9 +6,10 @@ import * as S from "./style";
 import { getSelectedDate, saveSelectedDate } from "./util";
 
 import { getTxs, getTxSum } from "../../apis/tx";
+import { useAuth } from "../../contexts/auth";
+import { useError } from "../../contexts/error";
 import Calendar from "../../components/organisms/Calendar";
 import Header from "../../components/organisms/Header";
-import { useAuth } from "../../contexts/auth";
 import { capitalize } from "../../utils/string";
 import { ApiError } from "../../types/errorTypes";
 
@@ -32,7 +33,8 @@ interface Tx {
 const HomePage = () => {
   const initialDate = getSelectedDate();
   const navigate = useNavigate();
-  const { currentUser, deauthenticate } = useAuth();
+  const { currentUser } = useAuth();
+  const { handleApiError } = useError();
 
   const [selectedDate, setSelectedDate] = useState(
     dayjs(initialDate ?? undefined)
@@ -56,10 +58,7 @@ const HomePage = () => {
       setTxs(txs);
     } catch (error) {
       if (error instanceof ApiError) {
-        if (error.errorCode === "AUTH_INVALID_TOKEN") {
-          deauthenticate();
-          navigate("/login", { replace: true });
-        }
+        handleApiError(error, navigate);
       }
     }
   }, []);
