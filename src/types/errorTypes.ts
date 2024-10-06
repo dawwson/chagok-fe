@@ -1,13 +1,13 @@
 export class ApiError extends Error {
   path: string;
   errorCode: string;
-  detail: number;
+  detail: string;
   timestamp: string;
 
   constructor(
     path: string,
     errorCode: string,
-    detail: number,
+    detail: string,
     timestamp: string
   ) {
     super(`Error ${errorCode}: ${detail}`);
