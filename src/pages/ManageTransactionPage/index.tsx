@@ -10,6 +10,7 @@ import ChipButton from "../../components/atoms/ChipButton";
 import StyledCheckbox from "../../components/atoms/StyledCheckbox";
 import Header from "../../components/organisms/Header";
 import LoadingScreen from "../../components/organisms/LoadingScreen";
+import Modal from "../../components/organisms/Modal";
 
 import { ApiError } from "../../types/errorTypes";
 import { capitalize } from "../../utils/string";
@@ -54,6 +55,7 @@ const ManageTransactionPage = () => {
   const isAddPage = !!selectedDate;
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [tx, setTx] = useState<Tx>({
     id: txId,
@@ -120,11 +122,11 @@ const ManageTransactionPage = () => {
     setTx({ ...tx, isExcluded: !tx.isExcluded });
   };
 
-  const handleClickCancel = () => {
-    // TODO: 모달로 변경
+  const handleCancel = () => {
+    navigate("/");
   };
 
-  const handleClickAddOrUpdate = async () => {
+  const handleAddOrUpdate = async () => {
     try {
       if (isAddPage) {
         await createTx(tx);
@@ -148,10 +150,13 @@ const ManageTransactionPage = () => {
   };
 
   const handleClickDelete = async () => {
+    setIsOpen(true);
+  };
+
+  const handleClickModalRightBtn = async () => {
     if (!isEditPage) {
       return;
     }
-    // TODO: 모달 연결(yes or no)
 
     try {
       await deleteTx(txId);
@@ -224,123 +229,147 @@ const ManageTransactionPage = () => {
   }
 
   return (
-    <S.Wrapper>
-      <S.LeftWrapper>
-        <Header
-          title={isEditPage ? "Edit a transaction" : "Add a transaction"}
-          description="Enter your income or expenses."
-        />
-        <S.TransactionContainer>
-          <S.Date>{renderDate()}</S.Date>
-          <S.Type>{capitalize(tx.txType)}</S.Type>
-          <S.Amount>₩{tx.amount.toLocaleString()}</S.Amount>
-          <S.Category>
-            {capitalize(
-              categories.find(({ id }) => id === tx.categoryId)?.name ?? ""
-            )}
-          </S.Category>
-          <S.Description>
-            {`${capitalize(tx.txMethod)}${
-              tx.description ? ` - ${tx.description}` : ""
-            }`}
-          </S.Description>
-          <S.ButtonGroup>
-            <BasicButton
-              label="Cancel"
-              size="large"
-              type="cancel"
-              onClick={() => console.log("취소")}
-            />
-            <BasicButton
-              label={isAddPage ? "Add" : "Update"}
-              size="large"
-              type="confirm"
-              onClick={handleClickAddOrUpdate}
-            />
-          </S.ButtonGroup>
-        </S.TransactionContainer>
-      </S.LeftWrapper>
-      <S.RightWrapper>
-        <S.SelectorWrapper>
-          <S.SubTitle>Type</S.SubTitle>
-          <S.ChipGroup>
-            <ChipButton
-              label="Income"
-              selected={tx.txType === "income"}
-              onClick={() => handleSelectTxType("income")}
-            />
-            <ChipButton
-              label="Expense"
-              selected={tx.txType === "expense"}
-              onClick={() => handleSelectTxType("expense")}
-            />
-          </S.ChipGroup>
-        </S.SelectorWrapper>
-        <S.SelectorWrapper>
-          <S.SubTitle>Transaction Method</S.SubTitle>
-          <S.ChipGroup>
-            <ChipButton
-              label="Cash"
-              selected={tx.txMethod === "cash"}
-              onClick={() => handleSelectTxMethod("cash")}
-            />
-            <ChipButton
-              label="Debit Card"
-              selected={tx.txMethod === "debit card"}
-              onClick={() => handleSelectTxMethod("debit card")}
-            />
-            <ChipButton
-              label="Credit Card"
-              selected={tx.txMethod === "credit card"}
-              onClick={() => handleSelectTxMethod("credit card")}
-            />
-            <ChipButton
-              label="Bank Transfer"
-              selected={tx.txMethod === "bank transfer"}
-              onClick={() => handleSelectTxMethod("bank transfer")}
-            />
-          </S.ChipGroup>
-        </S.SelectorWrapper>
-        <S.SelectorWrapper>
-          <S.SubTitle>Category</S.SubTitle>
-          <S.ChipGroup>{renderCategoryChips()}</S.ChipGroup>
-        </S.SelectorWrapper>
-        <S.SelectorWrapper>
-          <S.SubTitle>Amount</S.SubTitle>
-          <S.Input
-            name="amount"
-            value={tx.amount.toLocaleString()}
-            onChange={handleChangeAmount}
+    <>
+      <S.Wrapper>
+        <S.LeftWrapper>
+          <Header
+            title={isEditPage ? "Edit a transaction" : "Add a transaction"}
+            description="Enter your income or expenses."
           />
-        </S.SelectorWrapper>
-        <S.SelectorWrapper>
-          <S.SubTitle>Description</S.SubTitle>
-          <S.Input
-            name="description"
-            value={tx.description}
-            placeholder="This field is optional."
-            onChange={handleChangeDescription}
-          />
-        </S.SelectorWrapper>
-        <S.SelectorWrapper>
-          <StyledCheckbox
-            label="Exclude from transaction sum"
-            isChecked={tx.isExcluded}
-            onChange={handleChangeCheckbox}
-          />
-        </S.SelectorWrapper>
-        {isEditPage && (
-          <S.DeleteButtonWrapper>
-            <BasicButton
-              label="Delete"
-              type="danger"
-              size="large"
-              onClick={handleClickDelete}
+          <S.TransactionContainer>
+            <S.Date>{renderDate()}</S.Date>
+            <S.Type>{capitalize(tx.txType)}</S.Type>
+            <S.Amount>₩{tx.amount.toLocaleString()}</S.Amount>
+            <S.Category>
+              {capitalize(
+                categories.find(({ id }) => id === tx.categoryId)?.name ?? ""
+              )}
+            </S.Category>
+            <S.Description>
+              {`${capitalize(tx.txMethod)}${
+                tx.description ? ` - ${tx.description}` : ""
+              }`}
+            </S.Description>
+            <S.ButtonGroup>
+              <BasicButton
+                label="Cancel"
+                size="large"
+                type="cancel"
+                onClick={handleCancel}
+              />
+              <BasicButton
+                label={isAddPage ? "Add" : "Update"}
+                size="large"
+                type="confirm"
+                onClick={handleAddOrUpdate}
+              />
+            </S.ButtonGroup>
+          </S.TransactionContainer>
+        </S.LeftWrapper>
+        <S.RightWrapper>
+          <S.SelectorWrapper>
+            <S.SubTitle>Type</S.SubTitle>
+            <S.ChipGroup>
+              <ChipButton
+                label="Income"
+                selected={tx.txType === "income"}
+                onClick={() => handleSelectTxType("income")}
+              />
+              <ChipButton
+                label="Expense"
+                selected={tx.txType === "expense"}
+                onClick={() => handleSelectTxType("expense")}
+              />
+            </S.ChipGroup>
+          </S.SelectorWrapper>
+          <S.SelectorWrapper>
+            <S.SubTitle>Transaction Method</S.SubTitle>
+            <S.ChipGroup>
+              <ChipButton
+                label="Cash"
+                selected={tx.txMethod === "cash"}
+                onClick={() => handleSelectTxMethod("cash")}
+              />
+              <ChipButton
+                label="Debit Card"
+                selected={tx.txMethod === "debit card"}
+                onClick={() => handleSelectTxMethod("debit card")}
+              />
+              <ChipButton
+                label="Credit Card"
+                selected={tx.txMethod === "credit card"}
+                onClick={() => handleSelectTxMethod("credit card")}
+              />
+              <ChipButton
+                label="Bank Transfer"
+                selected={tx.txMethod === "bank transfer"}
+                onClick={() => handleSelectTxMethod("bank transfer")}
+              />
+            </S.ChipGroup>
+          </S.SelectorWrapper>
+          <S.SelectorWrapper>
+            <S.SubTitle>Category</S.SubTitle>
+            <S.ChipGroup>{renderCategoryChips()}</S.ChipGroup>
+          </S.SelectorWrapper>
+          <S.SelectorWrapper>
+            <S.SubTitle>Amount</S.SubTitle>
+            <S.Input
+              name="amount"
+              value={tx.amount.toLocaleString()}
+              onChange={handleChangeAmount}
             />
-          </S.DeleteButtonWrapper>
-        )}
-      </S.RightWrapper>
-    </S.Wrapper>
+          </S.SelectorWrapper>
+          <S.SelectorWrapper>
+            <S.SubTitle>Description</S.SubTitle>
+            <S.Input
+              name="description"
+              value={tx.description}
+              placeholder="This field is optional."
+              onChange={handleChangeDescription}
+            />
+          </S.SelectorWrapper>
+          <S.SelectorWrapper>
+            <StyledCheckbox
+              label="Exclude from transaction sum"
+              isChecked={tx.isExcluded}
+              onChange={handleChangeCheckbox}
+            />
+          </S.SelectorWrapper>
+          {isEditPage && (
+            <S.DeleteButtonWrapper>
+              <BasicButton
+                label="Delete"
+                type="danger"
+                size="large"
+                onClick={handleClickDelete}
+              />
+            </S.DeleteButtonWrapper>
+          )}
+        </S.RightWrapper>
+      </S.Wrapper>
+      {isOpen && (
+        <Modal
+          type="warn"
+          buttons={[
+            {
+              label: "Cancel",
+              location: "left",
+              onClick: () => setIsOpen(false),
+            },
+            {
+              label: "Delete",
+              location: "right",
+              onClick: handleClickModalRightBtn,
+            },
+          ]}
+        >
+          <p style={{ lineHeight: "1.5" }}>
+            Are you sure you want to delete this?{<br />}This action cannot be
+            undone.
+          </p>
+        </Modal>
+      )}
+    </>
   );
 };
 
