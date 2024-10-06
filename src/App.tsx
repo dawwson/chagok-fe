@@ -4,6 +4,8 @@ import reset from "styled-reset";
 
 import { lightTheme } from "./configs/theme";
 import { AuthProvider } from "./contexts/auth";
+
+import AuthLayout from "./components/templates/AuthLayout";
 import MainLayout from "./components/templates/MainLayout";
 import PrivateRoute from "./components/templates/PrivateRoute";
 
@@ -14,7 +16,7 @@ import ManageBudgetPage from "./pages/ManageBudgetPage";
 import StatsPage from "./pages/StatsPage";
 import LoginPage from "./pages/LoginPage";
 import JoinPage from "./pages/JoinPage";
-import AuthLayout from "./components/templates/AuthLayout";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -73,6 +75,10 @@ const router = createBrowserRouter([
         <JoinPage />
       </AuthLayout>
     ),
+  },
+  {
+    path: "*", // Add the wildcard route here for unmatched paths
+    element: <NotFoundPage />, // This will render the 404 page for any undefined route
   },
 ]);
 
