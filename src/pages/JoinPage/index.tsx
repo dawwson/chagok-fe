@@ -1,15 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import * as S from "./style";
 import { signUpWithEmailAndPassword } from "../../apis/auth";
-import { useAuth } from "../../contexts/auth";
 import { useError } from "../../contexts/error";
 import { ApiError } from "../../types/errorTypes";
 
 const JoinPage = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
   const { handleApiError } = useError();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -53,12 +51,6 @@ const JoinPage = () => {
     }
   };
 
-  useEffect(() => {
-    if (currentUser) {
-      navigate("/");
-    }
-  }, [currentUser, navigate]);
-
   return (
     <S.Wrapper>
       <S.Title>Join to Chagok 💰</S.Title>
@@ -92,8 +84,6 @@ const JoinPage = () => {
           value={isLoading ? "Loading..." : "Sign up with Email"}
         />
       </S.Form>
-      {/* 에러메세지 나중에 모달로 변경 */}
-      {/* <span>{error}</span> */}
       <S.Switcher>
         Already have an account? <Link to="/login">Login &rarr;</Link>
       </S.Switcher>

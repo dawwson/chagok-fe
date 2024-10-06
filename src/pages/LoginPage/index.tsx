@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import * as S from "./style";
@@ -9,7 +9,7 @@ import { useError } from "../../contexts/error";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { authenticate, currentUser } = useAuth();
+  const { authenticate } = useAuth();
   const { handleApiError } = useError();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -46,12 +46,6 @@ const LoginPage = () => {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (currentUser) {
-      navigate("/");
-    }
-  }, [currentUser, navigate]);
 
   return (
     <S.Wrapper>
