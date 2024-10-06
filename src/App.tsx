@@ -4,24 +4,30 @@ import reset from "styled-reset";
 
 import { lightTheme } from "./configs/theme";
 import { AuthProvider } from "./contexts/auth";
+import { ErrorProvider } from "./contexts/error";
+
+import AuthLayout from "./components/templates/AuthLayout";
 import MainLayout from "./components/templates/MainLayout";
 import PrivateRoute from "./components/templates/PrivateRoute";
 
 import HomePage from "./pages/HomePage";
-import AddTransactionPage from "./pages/AddTransactionPage";
+import ManageTransactionPage from "./pages/ManageTransactionPage";
 import ProfilePage from "./pages/ProfilePage";
 import ManageBudgetPage from "./pages/ManageBudgetPage";
 import StatsPage from "./pages/StatsPage";
 import LoginPage from "./pages/LoginPage";
 import JoinPage from "./pages/JoinPage";
-import AuthLayout from "./components/templates/AuthLayout";
+import NotFoundPage from "./pages/NotFoundPage";
+import ForbiddenPage from "./pages/ForbiddenPage";
 
 function App() {
   return (
     <AuthProvider>
       <ThemeProvider theme={lightTheme}>
         <GlobalStyles />
-        <RouterProvider router={router} />
+        <ErrorProvider>
+          <RouterProvider router={router} />
+        </ErrorProvider>
       </ThemeProvider>
     </AuthProvider>
   );
@@ -45,8 +51,8 @@ const router = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
-        path: "/add-transaction",
-        element: <AddTransactionPage />,
+        path: "/manage-transaction",
+        element: <ManageTransactionPage />,
       },
       {
         path: "/manage-budget",
@@ -73,6 +79,14 @@ const router = createBrowserRouter([
         <JoinPage />
       </AuthLayout>
     ),
+  },
+  {
+    path: "/403",
+    element: <ForbiddenPage />,
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ]);
 

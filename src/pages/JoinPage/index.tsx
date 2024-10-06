@@ -1,17 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import * as S from "./style";
-import { ApiError } from "../../types/errorTypes";
-import { useAuth } from "../../contexts/auth";
 import { signUpWithEmailAndPassword } from "../../apis/auth";
+import { useError } from "../../contexts/error";
+import { ApiError } from "../../types/errorTypes";
 
 const JoinPage = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { handleApiError } = useError();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
@@ -42,11 +41,7 @@ const JoinPage = () => {
       navigate("/login");
     } catch (error) {
       if (error instanceof ApiError) {
-        if (error.errorCode === "USER_EMAIL_IS_DUPLICATED") {
-          setError(
-            "This email address cannot be used. Please try a different one."
-          );
-        }
+        handleApiError(error);
       }
     } finally {
       setIsLoading(false);
@@ -55,12 +50,6 @@ const JoinPage = () => {
       setNickname("");
     }
   };
-
-  useEffect(() => {
-    if (currentUser) {
-      navigate("/");
-    }
-  }, [currentUser, navigate]);
 
   return (
     <S.Wrapper>
@@ -95,8 +84,6 @@ const JoinPage = () => {
           value={isLoading ? "Loading..." : "Sign up with Email"}
         />
       </S.Form>
-      {/* 에러메세지 나중에 모달로 변경 */}
-      <span>{error}</span>
       <S.Switcher>
         Already have an account? <Link to="/login">Login &rarr;</Link>
       </S.Switcher>

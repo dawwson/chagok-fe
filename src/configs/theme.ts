@@ -15,6 +15,7 @@ export const lightTheme = {
   button: {
     primary: DARK_BLUE,
     secondary: LIGHT_GRAY,
+    tertiary: WHITE,
     danger: RED,
   },
   text: {
@@ -30,27 +31,3 @@ export const lightTheme = {
     danger: WHITE,
   },
 };
-
-export interface LightTheme {
-  background: {
-    white: string;
-    light_blue: string;
-  };
-  button: {
-    primary: string;
-    secondary: string;
-    danger: string;
-  };
-  text: {
-    primary: string;
-    secondary: string;
-    tertiary: string;
-    accent: string;
-    danger: string;
-  };
-  buttonText: {
-    primary: string;
-    secondary: string;
-    danger: string;
-  };
-}

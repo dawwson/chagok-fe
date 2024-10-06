@@ -1,19 +1,20 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import * as S from "./style";
 import { signInWithEmailAndPassword } from "../../apis/auth";
 import { ApiError } from "../../types/errorTypes";
 import { useAuth } from "../../contexts/auth";
+import { useError } from "../../contexts/error";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { authenticate, currentUser } = useAuth();
+  const { authenticate } = useAuth();
+  const { handleApiError } = useError();
 
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,25 +40,12 @@ const LoginPage = () => {
       navigate("/", { replace: true });
     } catch (error) {
       if (error instanceof ApiError) {
-        if (error.errorCode === "USER_EMAIL_DO_NOT_EXIST") {
-          setError("The email address you entered doesn't match any account.");
-        }
-        if (error.errorCode === "USER_PASSWORD_IS_WRONG") {
-          setError("The password you entered is incorrect. Please try again.");
-        }
-      } else {
-        console.log(error);
+        handleApiError(error);
       }
     } finally {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (currentUser) {
-      navigate("/");
-    }
-  }, [currentUser, navigate]);
 
   return (
     <S.Wrapper>
@@ -84,8 +72,6 @@ const LoginPage = () => {
           value={isLoading ? "Loading..." : "Sign in with Email"}
         />
       </S.Form>
-      {/* 에러메세지 나중에 모달로 변경 */}
-      <span>{error}</span>
       <S.Switcher>
         Don't have an account? <Link to="/join">Join &rarr;</Link>
       </S.Switcher>

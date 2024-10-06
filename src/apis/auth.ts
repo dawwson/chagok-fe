@@ -1,4 +1,4 @@
-import axiosInstance from "./axiosInstance";
+import axios from "./axiosInstance";
 
 const API_URL = "/auth";
 
@@ -14,13 +14,13 @@ export const signUpWithEmailAndPassword = async (
   password: string,
   nickname: string
 ) => {
-  const response = (await axiosInstance.post(`${API_URL}/sign-up`, {
+  const response = await axios.post(`${API_URL}/sign-up`, {
     email,
     password,
     nickname,
-  })) as unknown as SignUpResponse;
+  });
 
-  return response;
+  return response as unknown as SignUpResponse;
 };
 
 interface SignInResponse {
@@ -33,17 +33,17 @@ export const signInWithEmailAndPassword = async (
   email: string,
   password: string
 ) => {
-  const response = (await axiosInstance.post(`${API_URL}/sign-in`, {
+  const response = await axios.post(`${API_URL}/sign-in`, {
     email,
     password,
-  })) as unknown as SignInResponse;
+  });
 
-  return response;
+  return response as unknown as SignInResponse;
 };
 
 // 로그아웃
 export const signOut = async () => {
-  await axiosInstance.post(`${API_URL}/sign-out`);
+  await axios.post(`${API_URL}/sign-out`);
 };
 
 // TODO: 회원 탈퇴
