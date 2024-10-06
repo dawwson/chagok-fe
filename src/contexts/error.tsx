@@ -40,7 +40,7 @@ export const ErrorProvider = ({ children }: Props) => {
         break;
       case "USER_PASSWORD_IS_WRONG":
         setErrorMessage(
-          "The password you entered is incorrect. Please try again."
+          "The password you entered is incorrect.\nPlease try again."
         );
         break;
       // 404
