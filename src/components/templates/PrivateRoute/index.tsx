@@ -12,10 +12,8 @@ const PrivateRoute = ({ children }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (currentUser) {
-      setIsLoading(false);
-    }
-  }, [currentUser]);
+    setIsLoading(false);
+  }, []);
 
   if (isLoading) {
     return <LoadingScreen />;
