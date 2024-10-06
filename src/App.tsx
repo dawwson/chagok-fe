@@ -4,6 +4,7 @@ import reset from "styled-reset";
 
 import { lightTheme } from "./configs/theme";
 import { AuthProvider } from "./contexts/auth";
+import { ErrorProvider } from "./contexts/error";
 
 import AuthLayout from "./components/templates/AuthLayout";
 import MainLayout from "./components/templates/MainLayout";
@@ -24,7 +25,9 @@ function App() {
     <AuthProvider>
       <ThemeProvider theme={lightTheme}>
         <GlobalStyles />
-        <RouterProvider router={router} />
+        <ErrorProvider>
+          <RouterProvider router={router} />
+        </ErrorProvider>
       </ThemeProvider>
     </AuthProvider>
   );
