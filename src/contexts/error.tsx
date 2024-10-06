@@ -51,6 +51,12 @@ export const ErrorProvider = ({ children }: Props) => {
       case "TX_FORBIDDEN":
         navigateFn?.("/403");
         break;
+      // 409
+      case "USER_EMAIL_IS_DUPLICATED":
+        setErrorMessage(
+          "This email address cannot be used.\nPlease try a different one."
+        );
+        break;
       default:
         setErrorMessage(error.detail);
         break;
