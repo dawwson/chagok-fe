@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import * as S from "./style";
 import { getCategories } from "../../apis/category";
-import { createTx, getTxDetail, updateTx } from "../../apis/tx";
+import { createTx, deleteTx, getTxDetail, updateTx } from "../../apis/tx";
 
 import BasicButton from "../../components/atoms/BasicButton";
 import ChipButton from "../../components/atoms/ChipButton";
@@ -11,9 +11,9 @@ import StyledCheckbox from "../../components/atoms/StyledCheckbox";
 import Header from "../../components/organisms/Header";
 import LoadingScreen from "../../components/organisms/LoadingScreen";
 
+import { ApiError } from "../../types/errorTypes";
 import { capitalize } from "../../utils/string";
 import { localize } from "../../utils/date";
-import { ApiError } from "../../types/errorTypes";
 
 const DEFAULT_INCOME_CATEGORY_ID = 1;
 const DEFAULT_EXPENSE_CATEGORY_ID = 5;
@@ -134,12 +134,12 @@ const ManageTransactionPage = () => {
       }
     } catch (error) {
       if (error instanceof ApiError) {
-        // TODO: 모달로 변경
         if (error.errorCode === "CATEGORY_NOT_FOUND") {
+          // TODO: 모달 연결
           console.log(error.detail);
         }
         if (error.errorCode === "TX_FORBIDDEN") {
-          console.log(error.detail);
+          navigate("/403", { replace: true });
         }
       }
     } finally {
@@ -147,8 +147,24 @@ const ManageTransactionPage = () => {
     }
   };
 
-  const handleClickDelete = () => {
-    console.log("delete");
+  const handleClickDelete = async () => {
+    if (!isEditPage) {
+      return;
+    }
+    // TODO: 모달 연결(yes or no)
+
+    try {
+      await deleteTx(txId);
+      navigate("/", { replace: true });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        const { errorCode } = error;
+
+        if (errorCode === "TX_FORBIDDEN") {
+          navigate("/403", { replace: true });
+        }
+      }
+    }
   };
 
   const renderDate = () => {
@@ -181,8 +197,16 @@ const ManageTransactionPage = () => {
       setCategories(categories);
 
       if (isEditPage) {
-        const txDetail = await getTxDetail(txId);
-        setTx(txDetail);
+        try {
+          const txDetail = await getTxDetail(txId);
+          setTx(txDetail);
+        } catch (error) {
+          if (error instanceof ApiError) {
+            if (error.errorCode === "TX_FORBIDDEN") {
+              navigate("/403", { replace: true });
+            }
+          }
+        }
       }
     };
 
@@ -193,7 +217,7 @@ const ManageTransactionPage = () => {
     fetchData();
 
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, [isEditPage, txId]);
 
   if (isEditPage && isLoading) {
     return <LoadingScreen />;

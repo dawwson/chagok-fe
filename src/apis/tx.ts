@@ -124,5 +124,4 @@ export const getTxDetail = async (txId: number) => {
  */
 export const deleteTx = async (txId: number) => {
   await axios.delete(`${API_URL}/${txId}`);
-  return;
 };

@@ -17,6 +17,7 @@ import StatsPage from "./pages/StatsPage";
 import LoginPage from "./pages/LoginPage";
 import JoinPage from "./pages/JoinPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ForbiddenPage from "./pages/ForbiddenPage";
 
 function App() {
   return (
@@ -77,8 +78,12 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "*", // Add the wildcard route here for unmatched paths
-    element: <NotFoundPage />, // This will render the 404 page for any undefined route
+    path: "/403",
+    element: <ForbiddenPage />,
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ]);
 
