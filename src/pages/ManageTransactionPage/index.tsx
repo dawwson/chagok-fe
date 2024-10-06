@@ -5,6 +5,8 @@ import * as S from "./style";
 import { getCategories } from "../../apis/category";
 import { createTx, deleteTx, getTxDetail, updateTx } from "../../apis/tx";
 
+import { useError } from "../../contexts/error";
+
 import BasicButton from "../../components/atoms/BasicButton";
 import ChipButton from "../../components/atoms/ChipButton";
 import StyledCheckbox from "../../components/atoms/StyledCheckbox";
@@ -18,7 +20,7 @@ import { localize } from "../../utils/date";
 
 const DEFAULT_INCOME_CATEGORY_ID = 1;
 const DEFAULT_EXPENSE_CATEGORY_ID = 5;
-const MAT_AMOUNT = 20000000000;
+const MAT_AMOUNT = 1000000000; // 10억
 const MAX_DESCRIPTION_LENGTH = 100;
 
 type TxType = "income" | "expense";
@@ -48,8 +50,8 @@ interface HomeState {
 
 const ManageTransactionPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { txId, selectedDate } = (location.state as HomeState) || {};
+  const { handleApiError } = useError();
+  const { txId, selectedDate } = (useLocation().state as HomeState) || {};
 
   const isEditPage = !!txId;
   const isAddPage = !!selectedDate;
@@ -134,18 +136,11 @@ const ManageTransactionPage = () => {
       if (isEditPage) {
         await updateTx({ id: txId, ...tx });
       }
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.errorCode === "CATEGORY_NOT_FOUND") {
-          // TODO: 모달 연결
-          console.log(error.detail);
-        }
-        if (error.errorCode === "TX_FORBIDDEN") {
-          navigate("/403", { replace: true });
-        }
-      }
-    } finally {
       navigate("/", { replace: true });
+    } catch (error: unknown) {
+      if (error instanceof ApiError) {
+        handleApiError(error, navigate);
+      }
     }
   };
 
@@ -163,11 +158,7 @@ const ManageTransactionPage = () => {
       navigate("/", { replace: true });
     } catch (error) {
       if (error instanceof ApiError) {
-        const { errorCode } = error;
-
-        if (errorCode === "TX_FORBIDDEN") {
-          navigate("/403", { replace: true });
-        }
+        handleApiError(error, navigate);
       }
     }
   };
@@ -207,9 +198,7 @@ const ManageTransactionPage = () => {
           setTx(txDetail);
         } catch (error) {
           if (error instanceof ApiError) {
-            if (error.errorCode === "TX_FORBIDDEN") {
-              navigate("/403", { replace: true });
-            }
+            handleApiError(error, navigate);
           }
         }
       }
