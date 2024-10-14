@@ -26,7 +26,7 @@ const ManageBudgetPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [budgets, setBudgets] = useState<Budget[]>(testBudgets);
-  const [totalBudget, setTotalBudget] = useState(0);
+  const [totalBudget, setTotalBudget] = useState<number>();
 
   const handleSave = () => {
     // TODO: 예산 설정 API 연동
@@ -171,7 +171,7 @@ const ManageBudgetPage = () => {
           </p>
           <ModalInput
             name="totalAmount"
-            value={totalBudget === 0 ? "" : totalBudget.toLocaleString()}
+            value={totalBudget?.toLocaleString()}
             placeholder="Enter your montly budget"
             onChange={handleChangeModalInput}
           />
