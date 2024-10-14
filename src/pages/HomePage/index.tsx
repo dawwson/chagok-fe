@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -6,9 +6,10 @@ import * as S from "./style";
 import { getSelectedDate, saveSelectedDate } from "./util";
 
 import { getTxs, getTxSum } from "../../apis/tx";
+import { useAuth } from "../../contexts/auth";
+import { useError } from "../../contexts/error";
 import Calendar from "../../components/organisms/Calendar";
 import Header from "../../components/organisms/Header";
-import { useAuth } from "../../contexts/auth";
 import { capitalize } from "../../utils/string";
 import { ApiError } from "../../types/errorTypes";
 
@@ -30,69 +31,57 @@ interface Tx {
 }
 
 const HomePage = () => {
-  const navigate = useNavigate();
-  const { currentUser, deauthenticate } = useAuth();
-
   const initialDate = getSelectedDate();
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const { handleApiError } = useError();
+
   const [selectedDate, setSelectedDate] = useState(
     dayjs(initialDate ?? undefined)
   );
   const [sum, setSum] = useState<Sum | null>(null);
   const [txs, setTxs] = useState<Tx[]>([]);
 
-  const handleOnClickAdd = () => {
-    navigate("/add-transaction");
-  };
-
-  const handleOnChangeDate = async (date: Dayjs) => {
-    const startDate = date.startOf("day").toISOString();
-    const endDate = date.endOf("day").toISOString();
+  const fetchData = useCallback(async (date: Dayjs) => {
+    const startOfMonth = date.startOf("month").toISOString();
+    const endOfMonth = date.endOf("month").toISOString();
+    const startOfDay = date.startOf("day").toISOString();
+    const endOfDay = date.endOf("day").toISOString();
 
     try {
-      const txs = await getTxs(startDate, endDate);
-
-      setTxs(txs);
+      const [sum, txs] = await Promise.all([
+        getTxSum(startOfMonth, endOfMonth),
+        getTxs(startOfDay, endOfDay),
+      ]);
       setSelectedDate(date);
-      saveSelectedDate(date.toISOString());
+      setSum(sum);
+      setTxs(txs);
     } catch (error) {
       if (error instanceof ApiError) {
-        if (error.errorCode === "AUTH_INVALID_TOKEN") {
-          deauthenticate();
-          navigate("/login", { replace: true });
-        }
+        handleApiError(error, navigate);
       }
     }
+  }, []);
+
+  const handleChangeDate = async (date: Dayjs) => {
+    fetchData(date);
+    saveSelectedDate(date.toISOString());
+  };
+
+  const handleClickAdd = () => {
+    navigate("/manage-transaction", {
+      state: { selectedDate: selectedDate.toISOString() },
+      replace: true,
+    });
+  };
+
+  const handleClickListItem = (txId: number) => {
+    navigate("/manage-transaction", { state: { txId }, replace: true });
   };
 
   useEffect(() => {
-    if (!currentUser) {
-      navigate("/login");
-    }
-  }, [currentUser, navigate]);
-
-  useEffect(() => {
-    const fetchSum = async () => {
-      const startDate = selectedDate.startOf("month").toISOString();
-      const endDate = selectedDate.endOf("month").toISOString();
-
-      try {
-        const { totalIncome, totalExpense } = await getTxSum(
-          startDate,
-          endDate
-        );
-        setSum({ totalIncome, totalExpense });
-      } catch (error) {
-        if (error instanceof ApiError) {
-          if (error.errorCode === "AUTH_INVALID_TOKEN") {
-            deauthenticate();
-            navigate("/login", { replace: true });
-          }
-        }
-      }
-    };
-
-    fetchSum();
-  }, [selectedDate, deauthenticate, navigate]);
+    fetchData(selectedDate);
+  }, [fetchData]);
 
   return (
     <S.Wrapper>
@@ -106,21 +95,22 @@ const HomePage = () => {
           }`}
         />
         <S.CalendarContainer>
-          <Calendar selectedDate={selectedDate} onChange={handleOnChangeDate} />
+          <Calendar selectedDate={selectedDate} onChange={handleChangeDate} />
         </S.CalendarContainer>
       </S.LeftWrapper>
       <S.RightWrapper>
         <S.ButtonContainer>
-          <S.AddButton onClick={handleOnClickAdd}>
-            Add a transaction
-          </S.AddButton>
+          <S.AddButton onClick={handleClickAdd}>Add a transaction</S.AddButton>
         </S.ButtonContainer>
         <S.ListItemContainer>
           {txs.length === 0 ? (
             <S.Empty>Try to add a new transaction!</S.Empty>
           ) : (
             txs.map((tx) => (
-              <S.ListItem key={tx.id}>
+              <S.ListItem
+                key={tx.id}
+                onClick={() => handleClickListItem(tx.id)}
+              >
                 <S.Category>{capitalize(tx.categoryName)}</S.Category>
                 <S.PaymentMethod>{capitalize(tx.txMethod)}</S.PaymentMethod>
                 <S.Amount type={tx.txType}>
