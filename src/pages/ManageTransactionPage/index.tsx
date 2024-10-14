@@ -20,7 +20,7 @@ import { localize } from "../../utils/date";
 
 const DEFAULT_INCOME_CATEGORY_ID = 1;
 const DEFAULT_EXPENSE_CATEGORY_ID = 5;
-const MAT_AMOUNT = 1000000000; // 10억
+const MAX_AMOUNT = 1000000000; // 10억
 const MAX_DESCRIPTION_LENGTH = 100;
 
 type TxType = "income" | "expense";
@@ -102,8 +102,8 @@ const ManageTransactionPage = () => {
       return;
     }
 
-    if (formatted > MAT_AMOUNT) {
-      setTx({ ...tx, amount: MAT_AMOUNT });
+    if (formatted > MAX_AMOUNT) {
+      setTx({ ...tx, amount: MAX_AMOUNT });
       return;
     }
 
@@ -222,7 +222,7 @@ const ManageTransactionPage = () => {
       <S.Wrapper>
         <S.LeftWrapper>
           <Header
-            title={isEditPage ? "Edit a transaction" : "Add a transaction"}
+            title={isEditPage ? "Edit a Transaction" : "Add a Transaction"}
             description="Enter your income or expenses."
           />
           <S.TransactionContainer>
