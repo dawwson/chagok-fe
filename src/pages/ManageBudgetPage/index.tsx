@@ -9,6 +9,7 @@ import LoadingScreen from "../../components/organisms/LoadingScreen";
 import { ApiError } from "../../types/errorTypes";
 import { capitalize } from "../../utils/string";
 import { testBudgets } from "./sample";
+import Modal from "../../components/organisms/Modal";
 
 const MAX_AMOUNT = 1000000000; // 10억
 
@@ -23,15 +24,21 @@ const ManageBudgetPage = () => {
   const { handleApiError } = useError();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [budgets, setBudgets] = useState<Budget[]>(testBudgets);
+  const [totalBudget, setTotalBudget] = useState(0);
 
-  const handleCancel = () => {};
+  const handleSave = () => {
+    // TODO: 예산 설정 API 연동
+  };
 
-  const handleSave = () => {};
+  const handleRecommend = () => {
+    // TODO: 예산 추천 API 연동
+  };
 
-  const handleRecommend = () => {};
-
-  const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeBudgetInput = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value } = event.target;
 
     const categoryId = Number(name);
@@ -52,6 +59,18 @@ const ManageBudgetPage = () => {
         return budget;
       })
     );
+  };
+
+  const handleChangeModalInput = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { value } = event.target;
+    const totalAmount = Number(value.replace(/[,]/g, ""));
+
+    if (isNaN(totalAmount)) {
+      return;
+    }
+    setTotalBudget(totalAmount < MAX_AMOUNT ? totalAmount : MAX_AMOUNT);
   };
 
   useEffect(() => {
@@ -93,7 +112,7 @@ const ManageBudgetPage = () => {
                 label="Cancel"
                 size="large"
                 type="cancel"
-                onClick={handleCancel}
+                onClick={() => navigate("/", { replace: true })}
               />
               <BasicButton
                 label="Save"
@@ -106,7 +125,7 @@ const ManageBudgetPage = () => {
         </LeftWrapper>
         <RightWrapper>
           <ButtonContainer>
-            <RecommendButton onClick={handleRecommend}>
+            <RecommendButton onClick={() => setIsOpen(true)}>
               Recommend Budget
             </RecommendButton>
           </ButtonContainer>
@@ -122,13 +141,42 @@ const ManageBudgetPage = () => {
                 <ListItemInput
                   name={budget.categoryId.toString()}
                   value={budget.amount.toLocaleString()}
-                  onChange={handleChangeInput}
+                  onChange={handleChangeBudgetInput}
                 />
               </ListItem>
             ))}
           </ListItemContainer>
         </RightWrapper>
       </Wrapper>
+      {isOpen && (
+        <Modal
+          type="info"
+          buttons={[
+            {
+              label: "Cancel",
+              location: "left",
+              onClick: () => setIsOpen(false),
+            },
+            {
+              label: "Submit",
+              location: "right",
+              onClick: handleRecommend,
+            },
+          ]}
+        >
+          <p style={{ lineHeight: "1.5", marginBottom: "20px" }}>
+            Based on your past spending,
+            <br />
+            we recommend setting your budget.
+          </p>
+          <ModalInput
+            name="totalAmount"
+            value={totalBudget === 0 ? "" : totalBudget.toLocaleString()}
+            placeholder="Enter your montly budget"
+            onChange={handleChangeModalInput}
+          />
+        </Modal>
+      )}
     </>
   );
 };
@@ -235,11 +283,29 @@ export const ListItemInput = styled.input`
   font-size: 16px;
 
   &:focus {
-    border: 1px solid ${({ theme }) => theme.button.primary};
+    border: 1px solid ${({ theme }) => theme.text.accent};
   }
 
   &::placeholder {
     color: ${({ theme }) => theme.text.tertiary};
     opacity: 0.7;
+  }
+`;
+
+export const ModalInput = styled.input`
+  width: 100%;
+  padding: 8px 0;
+  border: none;
+  border-bottom: 2px solid ${({ theme }) => theme.text.tertiary};
+  outline: none;
+  font-size: 16px;
+  text-align: center;
+
+  &:focus {
+    border-bottom: 2px solid ${({ theme }) => theme.text.accent};
+  }
+
+  &::placeholder {
+    color: ${({ theme }) => theme.text.tertiary};
   }
 `;
