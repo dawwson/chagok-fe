@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
+import dayjs from "dayjs";
 
 import { useError } from "../../contexts/error";
 import BasicButton from "../../components/atoms/BasicButton";
 import Header from "../../components/organisms/Header";
+import Modal from "../../components/organisms/Modal";
 import LoadingScreen from "../../components/organisms/LoadingScreen";
 import { ApiError } from "../../types/errorTypes";
 import { capitalize } from "../../utils/string";
 import { testBudgets } from "./sample";
-import Modal from "../../components/organisms/Modal";
+import YearMonthPicker from "../../components/organisms/YearMonthPicker";
 
 const MAX_AMOUNT = 1000000000; // 10억
 
@@ -17,6 +19,11 @@ interface Budget {
   categoryId: number;
   categoryName: string;
   amount: number;
+}
+
+interface Date {
+  year: number; // yyyy
+  month: number; // m-mm
 }
 
 const ManageBudgetPage = () => {
@@ -27,6 +34,29 @@ const ManageBudgetPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [budgets, setBudgets] = useState<Budget[]>(testBudgets);
   const [totalBudget, setTotalBudget] = useState<number>();
+  const [date, setDate] = useState<Date>({
+    year: dayjs().year(),
+    month: dayjs().month() + 1,
+  });
+
+  const handleChangeDate = (direction: "prev" | "next") => {
+    const { year, month } = date;
+
+    if (direction === "prev") {
+      if (month === 1) {
+        setDate({ year: year - 1, month: 12 });
+      } else {
+        setDate({ ...date, month: month - 1 });
+      }
+    }
+    if (direction === "next") {
+      if (month === 12) {
+        setDate({ year: year + 1, month: 1 });
+      } else {
+        setDate({ ...date, month: month + 1 });
+      }
+    }
+  };
 
   const handleSave = () => {
     // TODO: 예산 설정 API 연동
@@ -73,6 +103,10 @@ const ManageBudgetPage = () => {
     setTotalBudget(totalAmount < MAX_AMOUNT ? totalAmount : MAX_AMOUNT);
   };
 
+  const caculateTotalAmount = () => {
+    return budgets.reduce((acc, budget) => (acc += budget.amount), 0);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -107,6 +141,19 @@ const ManageBudgetPage = () => {
             description="Set a monthly budget for each category."
           />
           <ResultContainer>
+            <YearMonthPicker
+              year={date.year}
+              month={date.month}
+              onChange={handleChangeDate}
+            />
+            <ResultSubtitle>Total</ResultSubtitle>
+            <ResultAmount>
+              ₩{caculateTotalAmount().toLocaleString()}
+            </ResultAmount>
+            <ResultDescription>
+              You have <span>₩{caculateTotalAmount().toLocaleString()} </span>
+              remaining from your total budget.
+            </ResultDescription>
             <ButtonGroup>
               <BasicButton
                 label="Cancel"
@@ -210,6 +257,30 @@ export const ResultContainer = styled.div`
   padding: 30px;
   text-align: center;
   overflow-y: auto;
+`;
+
+export const ResultSubtitle = styled.h1`
+  color: ${({ theme }) => theme.text.accent};
+  margin: 80px 0px 20px 0px;
+  font-size: 20px;
+  font-weight: 500;
+`;
+
+export const ResultAmount = styled.h1`
+  color: ${({ theme }) => theme.text.primary};
+  font-size: 50px;
+  margin-bottom: 50px;
+`;
+
+export const ResultDescription = styled.h1`
+  color: ${({ theme }) => theme.text.secondary};
+  font-size: 18px;
+  margin-bottom: 100px;
+  max-width: 100%;
+
+  & span {
+    font-weight: bold;
+  }
 `;
 
 export const ButtonGroup = styled.div`
