@@ -30,7 +30,7 @@ const ManageBudgetPage = () => {
   const { handleApiError } = useError();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [totalAmount, setTotalAmount] = useState<number>();
+  const [totalAmount, setTotalAmount] = useState<number>(0);
   const [budget, setBudget] = useState<Budget>({
     id: null,
     year: dayjs().year(),
@@ -218,7 +218,7 @@ const ManageBudgetPage = () => {
           </p>
           <ModalInput
             name="totalAmount"
-            value={totalAmount?.toLocaleString()}
+            value={totalAmount === 0 ? "" : totalAmount.toLocaleString()}
             placeholder="Enter your montly budget"
             onChange={handleChangeModalInput}
           />
@@ -374,6 +374,10 @@ export const ModalInput = styled.input`
 
   &:focus {
     border-bottom: 2px solid ${({ theme }) => theme.text.accent};
+
+    &::placeholder {
+      opacity: 0; /* 포커스 시 placeholder 숨김 */
+    }
   }
 
   &::placeholder {
