@@ -3,57 +3,70 @@ import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import dayjs from "dayjs";
 
+import { getBudget } from "../../apis/budget";
 import { useError } from "../../contexts/error";
 import BasicButton from "../../components/atoms/BasicButton";
 import Header from "../../components/organisms/Header";
 import Modal from "../../components/organisms/Modal";
-import LoadingScreen from "../../components/organisms/LoadingScreen";
+import YearMonthPicker from "../../components/organisms/YearMonthPicker";
 import { ApiError } from "../../types/errorTypes";
 import { capitalize } from "../../utils/string";
-import { testBudgets } from "./sample";
-import YearMonthPicker from "../../components/organisms/YearMonthPicker";
 
 const MAX_AMOUNT = 1000000000; // 10억
 
 interface Budget {
-  categoryId: number;
-  categoryName: string;
-  amount: number;
-}
-
-interface Date {
-  year: number; // yyyy
-  month: number; // m-mm
+  id: number | null;
+  year: number; // YYYY
+  month: number; // M-MM
+  budgets: Array<{
+    categoryId: number;
+    categoryName: string;
+    amount: number;
+  }>;
 }
 
 const ManageBudgetPage = () => {
   const navigate = useNavigate();
   const { handleApiError } = useError();
 
-  const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  const [budgets, setBudgets] = useState<Budget[]>(testBudgets);
-  const [totalBudget, setTotalBudget] = useState<number>();
-  const [date, setDate] = useState<Date>({
+  const [totalAmount, setTotalAmount] = useState<number>();
+  const [budget, setBudget] = useState<Budget>({
+    id: null,
     year: dayjs().year(),
     month: dayjs().month() + 1,
+    budgets: [],
   });
 
-  const handleChangeDate = (direction: "prev" | "next") => {
-    const { year, month } = date;
+  const handleChangeDate = async (direction: "prev" | "next") => {
+    let year: number, month: number;
 
     if (direction === "prev") {
-      if (month === 1) {
-        setDate({ year: year - 1, month: 12 });
+      if (budget.month === 1) {
+        year = budget.year - 1;
+        month = 12;
       } else {
-        setDate({ ...date, month: month - 1 });
+        year = budget.year;
+        month = budget.month - 1;
       }
-    }
-    if (direction === "next") {
-      if (month === 12) {
-        setDate({ year: year + 1, month: 1 });
+    } else if (direction === "next") {
+      if (budget.month === 12) {
+        year = budget.year + 1;
+        month = 1;
       } else {
-        setDate({ ...date, month: month + 1 });
+        year = budget.year;
+        month = budget.month + 1;
+      }
+    } else {
+      return;
+    }
+
+    try {
+      const find = await getBudget(year, month);
+      setBudget(find);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        handleApiError(error, navigate);
       }
     }
   };
@@ -72,23 +85,20 @@ const ManageBudgetPage = () => {
     const { name, value } = event.target;
 
     const categoryId = Number(name);
-    const amount = Number(value.replace(/[,]/g, ""));
+    const newAmount = Number(value.replace(/[,]/g, ""));
 
-    if (isNaN(amount)) {
+    if (isNaN(newAmount)) {
       return;
     }
 
-    setBudgets((prev) =>
-      prev.map((budget) => {
-        if (budget.categoryId === categoryId) {
-          return {
-            ...budget,
-            amount: amount > MAX_AMOUNT ? MAX_AMOUNT : amount,
-          };
-        }
-        return budget;
-      })
-    );
+    setBudget((prevBudget) => ({
+      ...prevBudget,
+      budgets: prevBudget.budgets.map((b) =>
+        b.categoryId === categoryId
+          ? { ...b, amount: newAmount > MAX_AMOUNT ? MAX_AMOUNT : newAmount }
+          : b
+      ),
+    }));
   };
 
   const handleChangeModalInput = (
@@ -100,18 +110,18 @@ const ManageBudgetPage = () => {
     if (isNaN(totalAmount)) {
       return;
     }
-    setTotalBudget(totalAmount < MAX_AMOUNT ? totalAmount : MAX_AMOUNT);
+    setTotalAmount(totalAmount < MAX_AMOUNT ? totalAmount : MAX_AMOUNT);
   };
 
   const caculateTotalAmount = () => {
-    return budgets.reduce((acc, budget) => (acc += budget.amount), 0);
+    return budget.budgets.reduce((acc, budget) => (acc += budget.amount), 0);
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // TODO: API 연동
-        // setBudgets([]);
+        const find = await getBudget(budget.year, budget.month);
+        setBudget(find);
       } catch (error) {
         if (error instanceof ApiError) {
           handleApiError(error, navigate);
@@ -119,18 +129,8 @@ const ManageBudgetPage = () => {
       }
     };
 
-    const timeoutId = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
     fetchData();
-
-    return () => clearTimeout(timeoutId);
   }, []);
-
-  // if (isLoading) {
-  //   return <LoadingScreen />;
-  // }
 
   return (
     <>
@@ -142,8 +142,8 @@ const ManageBudgetPage = () => {
           />
           <ResultContainer>
             <YearMonthPicker
-              year={date.year}
-              month={date.month}
+              year={budget.year}
+              month={budget.month}
               onChange={handleChangeDate}
             />
             <ResultSubtitle>Total</ResultSubtitle>
@@ -177,17 +177,17 @@ const ManageBudgetPage = () => {
             </RecommendButton>
           </ButtonContainer>
           <ListItemContainer>
-            {budgets.map((budget) => (
-              <ListItem key={budget.categoryId}>
-                <ListItemTitle>{capitalize(budget.categoryName)}</ListItemTitle>
+            {budget.budgets.map((b) => (
+              <ListItem key={b.categoryId}>
+                <ListItemTitle>{capitalize(b.categoryName)}</ListItemTitle>
                 <ListItemSubtitle>
                   Potential savings : ₩{}
                   <br />
                   Spent : ₩{}
                 </ListItemSubtitle>
                 <ListItemInput
-                  name={budget.categoryId.toString()}
-                  value={budget.amount.toLocaleString()}
+                  name={b.categoryId.toString()}
+                  value={b.amount.toLocaleString()}
                   onChange={handleChangeBudgetInput}
                 />
               </ListItem>
@@ -218,7 +218,7 @@ const ManageBudgetPage = () => {
           </p>
           <ModalInput
             name="totalAmount"
-            value={totalBudget?.toLocaleString()}
+            value={totalAmount?.toLocaleString()}
             placeholder="Enter your montly budget"
             onChange={handleChangeModalInput}
           />
