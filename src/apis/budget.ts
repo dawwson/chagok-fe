@@ -9,12 +9,21 @@ interface CreateBudgetResponse {
   totalAmount: number;
   budgets: Array<{
     categoryId: number;
-    categoryName: string;
     amount: number;
   }>;
 }
 
-interface SetBudgetResponse {}
+interface UpdateBudgetResponse {
+  id: number;
+  year: number;
+  month: number;
+  totalAmount: number;
+  budgets: Array<{
+    categoryId: number;
+    amount: number;
+  }>;
+  updatedAt: string;
+}
 
 interface GetBudgetResponse {
   id: number | null;
@@ -36,19 +45,30 @@ interface GetBudgetRecommendationResponse {
 /**
  * 예산 생성
  */
-export const createBudget = async () => {
-  const response = await axios.post(`${API_URL}`, {});
+export const createBudget = async (
+  year: number,
+  month: number,
+  budgets: Array<{ categoryId: number; amount: number }>
+) => {
+  const response = await axios.post(`${API_URL}`, {
+    year,
+    month,
+    budgets,
+  });
 
   return response as unknown as CreateBudgetResponse;
 };
 
 /**
- * 🚧 예산 수정
+ * 예산 수정
  */
-export const setBudget = async () => {
-  const response = await axios.put(`${API_URL}`);
+export const updateBudget = async (
+  budgetId: number,
+  budgets: Array<{ categoryId: number; amount: number }>
+) => {
+  const response = await axios.put(`${API_URL}/${budgetId}`, { budgets });
 
-  return response as unknown as SetBudgetResponse;
+  return response as unknown as UpdateBudgetResponse;
 };
 
 /**

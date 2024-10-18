@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import dayjs from "dayjs";
 
-import { getBudget } from "../../apis/budget";
+import { createBudget, getBudget, updateBudget } from "../../apis/budget";
 import { useError } from "../../contexts/error";
 import BasicButton from "../../components/atoms/BasicButton";
 import Header from "../../components/organisms/Header";
@@ -12,7 +12,7 @@ import YearMonthPicker from "../../components/organisms/YearMonthPicker";
 import { ApiError } from "../../types/errorTypes";
 import { capitalize } from "../../utils/string";
 
-const MAX_AMOUNT = 1000000000; // 10억
+const MAX_AMOUNT = 2000000000; // 20억
 
 interface Budget {
   id: number | null;
@@ -29,7 +29,8 @@ const ManageBudgetPage = () => {
   const navigate = useNavigate();
   const { handleApiError } = useError();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [budget, setBudget] = useState<Budget>({
     id: null,
@@ -71,8 +72,22 @@ const ManageBudgetPage = () => {
     }
   };
 
-  const handleSave = () => {
-    // TODO: 예산 설정 API 연동
+  const handleSave = async () => {
+    try {
+      if (budget.id) {
+        await updateBudget(budget.id, budget.budgets);
+      } else {
+        await createBudget(budget.year, budget.month, budget.budgets);
+      }
+      setIsSuccessModalOpen(true);
+
+      const find = await getBudget(budget.year, budget.month);
+      setBudget(find);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        handleApiError(error, navigate);
+      }
+    }
   };
 
   const handleRecommend = () => {
@@ -172,7 +187,7 @@ const ManageBudgetPage = () => {
         </LeftWrapper>
         <RightWrapper>
           <ButtonContainer>
-            <RecommendButton onClick={() => setIsOpen(true)}>
+            <RecommendButton onClick={() => setIsRecommendModalOpen(true)}>
               Recommend Budget
             </RecommendButton>
           </ButtonContainer>
@@ -195,14 +210,14 @@ const ManageBudgetPage = () => {
           </ListItemContainer>
         </RightWrapper>
       </Wrapper>
-      {isOpen && (
+      {isRecommendModalOpen && (
         <Modal
           type="info"
           buttons={[
             {
               label: "Cancel",
               location: "left",
-              onClick: () => setIsOpen(false),
+              onClick: () => setIsRecommendModalOpen(false),
             },
             {
               label: "Submit",
@@ -222,6 +237,20 @@ const ManageBudgetPage = () => {
             placeholder="Enter your montly budget"
             onChange={handleChangeModalInput}
           />
+        </Modal>
+      )}
+      {isSuccessModalOpen && (
+        <Modal
+          type="success"
+          buttons={[
+            {
+              label: "Confirm",
+              location: "center",
+              onClick: () => setIsSuccessModalOpen(false),
+            },
+          ]}
+        >
+          <p>{`The budget has been ${budget.id ? "updated" : "created"}.`}</p>
         </Modal>
       )}
     </>
