@@ -4,6 +4,7 @@ import { styled } from "styled-components";
 import dayjs from "dayjs";
 
 import { createBudget, getBudget, updateBudget } from "../../apis/budget";
+import { getTxs } from "../../apis/tx";
 import { useError } from "../../contexts/error";
 import BasicButton from "../../components/atoms/BasicButton";
 import Header from "../../components/organisms/Header";
@@ -12,7 +13,7 @@ import YearMonthPicker from "../../components/organisms/YearMonthPicker";
 import { ApiError } from "../../types/errorTypes";
 import { capitalize } from "../../utils/string";
 
-const MAX_AMOUNT = 2000000000; // 20억
+const MAX_AMOUNT = 1000000000; // 10억
 
 interface Budget {
   id: number | null;
@@ -31,7 +32,9 @@ const ManageBudgetPage = () => {
 
   const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [totalAmount, setTotalAmount] = useState(0); // 화면에 보이는 총 예산
+  const [targetAmount, setTargetAmount] = useState(0); // 예산 추천시 입력하는 값
+  const [spents, setSpents] = useState<Map<string, number>>(new Map());
   const [budget, setBudget] = useState<Budget>({
     id: null,
     year: dayjs().year(),
@@ -120,16 +123,46 @@ const ManageBudgetPage = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { value } = event.target;
-    const totalAmount = Number(value.replace(/[,]/g, ""));
+    const amount = Number(value.replace(/[,]/g, ""));
 
-    if (isNaN(totalAmount)) {
+    if (isNaN(amount)) {
       return;
     }
-    setTotalAmount(totalAmount < MAX_AMOUNT ? totalAmount : MAX_AMOUNT);
+    setTargetAmount(amount < MAX_AMOUNT ? amount : MAX_AMOUNT);
   };
 
-  const caculateTotalAmount = () => {
-    return budget.budgets.reduce((acc, budget) => (acc += budget.amount), 0);
+  const calculateTotalAmount = () => {
+    return budget.budgets.reduce((acc, b) => (acc += b.amount), 0);
+  };
+
+  const calcuateTotalSpents = () => {
+    return [...spents.values()].reduce((acc, spent) => (acc += spent), 0);
+  };
+
+  const renderTotalSavings = () => {
+    const totalSavings = calculateTotalAmount() - calcuateTotalSpents();
+
+    if (totalSavings >= 0) {
+      return (
+        <>
+          You have{" "}
+          <SavingsSpan $isNegative={false}>
+            {totalSavings.toLocaleString()}₩{" "}
+          </SavingsSpan>
+          remaining from your total budget.
+        </>
+      );
+    } else {
+      return (
+        <>
+          You have exceeded your budget by{" "}
+          <SavingsSpan $isNegative={true}>
+            {Math.abs(totalSavings).toLocaleString()}₩
+          </SavingsSpan>
+          .
+        </>
+      );
+    }
   };
 
   useEffect(() => {
@@ -137,6 +170,22 @@ const ManageBudgetPage = () => {
       try {
         const find = await getBudget(budget.year, budget.month);
         setBudget(find);
+
+        const startOfMonth = dayjs(`${budget.year}-${budget.month}`)
+          .startOf("month")
+          .toISOString();
+        const endOfMonth = dayjs(`${budget.year}-${budget.month}`)
+          .endOf("month")
+          .toISOString();
+
+        const txs = await getTxs(startOfMonth, endOfMonth);
+        const spentMap = new Map();
+        txs.forEach((tx) => {
+          if (tx.txType === "expense") {
+            spentMap.set(tx.categoryName, tx.amount);
+          }
+        });
+        setSpents(spentMap);
       } catch (error) {
         if (error instanceof ApiError) {
           handleApiError(error, navigate);
@@ -145,7 +194,7 @@ const ManageBudgetPage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [budget.year, budget.month]);
 
   return (
     <>
@@ -163,12 +212,9 @@ const ManageBudgetPage = () => {
             />
             <ResultSubtitle>Total</ResultSubtitle>
             <ResultAmount>
-              ₩{caculateTotalAmount().toLocaleString()}
+              {calculateTotalAmount().toLocaleString()}₩
             </ResultAmount>
-            <ResultDescription>
-              You have <span>₩{caculateTotalAmount().toLocaleString()} </span>
-              remaining from your total budget.
-            </ResultDescription>
+            <ResultDescription>{renderTotalSavings()}</ResultDescription>
             <ButtonGroup>
               <BasicButton
                 label="Cancel"
@@ -196,9 +242,25 @@ const ManageBudgetPage = () => {
               <ListItem key={b.categoryId}>
                 <ListItemTitle>{capitalize(b.categoryName)}</ListItemTitle>
                 <ListItemSubtitle>
-                  Potential savings : ₩{}
-                  <br />
-                  Spent : ₩{}
+                  <p>
+                    Potential savings :{" "}
+                    <SavingsSpan
+                      $isNegative={
+                        b.amount - (spents.get(b.categoryName) ?? 0) < 0
+                      }
+                    >
+                      {(
+                        b.amount - (spents.get(b.categoryName) ?? 0)
+                      ).toLocaleString()}
+                      ₩
+                    </SavingsSpan>
+                  </p>
+                  <p>
+                    Spent :{" "}
+                    <span>
+                      {spents.get(b.categoryName)?.toLocaleString() ?? 0}₩
+                    </span>
+                  </p>
                 </ListItemSubtitle>
                 <ListItemInput
                   name={b.categoryId.toString()}
@@ -232,8 +294,8 @@ const ManageBudgetPage = () => {
             we recommend setting your budget.
           </p>
           <ModalInput
-            name="totalAmount"
-            value={totalAmount === 0 ? "" : totalAmount.toLocaleString()}
+            name="targetAmount"
+            value={targetAmount === 0 ? "" : targetAmount.toLocaleString()}
             placeholder="Enter your montly budget"
             onChange={handleChangeModalInput}
           />
@@ -371,6 +433,11 @@ export const ListItemSubtitle = styled.h2`
   font-size: 14px;
   color: ${({ theme }) => theme.text.secondary};
   line-height: 1.5;
+`;
+
+export const SavingsSpan = styled.span<{ $isNegative: boolean }>`
+  color: ${({ $isNegative, theme }) =>
+    $isNegative ? theme.text.danger : theme.text.accent};
 `;
 
 export const ListItemInput = styled.input`
