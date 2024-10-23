@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import dayjs from "dayjs";
 
-import { createBudget, getBudget, updateBudget } from "../../apis/budget";
+import {
+  createBudget,
+  getBudget,
+  getBudgetRecommendation,
+  updateBudget,
+} from "../../apis/budget";
 import { getTxs } from "../../apis/tx";
 import { useError } from "../../contexts/error";
 import BasicButton from "../../components/atoms/BasicButton";
@@ -32,7 +37,7 @@ const ManageBudgetPage = () => {
 
   const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [totalAmount, setTotalAmount] = useState(0); // 화면에 보이는 총 예산
+  const [successMessage, setSuccessMessage] = useState("");
   const [targetAmount, setTargetAmount] = useState(0); // 예산 추천시 입력하는 값
   const [spents, setSpents] = useState<Map<string, number>>(new Map());
   const [budget, setBudget] = useState<Budget>({
@@ -79,8 +84,10 @@ const ManageBudgetPage = () => {
     try {
       if (budget.id) {
         await updateBudget(budget.id, budget.budgets);
+        setSuccessMessage("The budget has been updated.");
       } else {
         await createBudget(budget.year, budget.month, budget.budgets);
+        setSuccessMessage("The budget has been created.");
       }
       setIsSuccessModalOpen(true);
 
@@ -93,8 +100,26 @@ const ManageBudgetPage = () => {
     }
   };
 
-  const handleRecommend = () => {
-    // TODO: 예산 추천 API 연동
+  const handleRecommend = async () => {
+    const recommended = await getBudgetRecommendation(
+      budget.year,
+      budget.month,
+      targetAmount
+    );
+
+    if (recommended.budgets.length === 0) {
+      setSuccessMessage(
+        "No recent budget data found.\nPlease set up your budget to start tracking your expenses!"
+      );
+    } else {
+      setSuccessMessage(
+        "Your budget recommendations have been generated!\nCheck them out and adjust as needed."
+      );
+      setBudget({ id: null, ...recommended });
+    }
+    setIsRecommendModalOpen(false);
+    setIsSuccessModalOpen(true);
+    setTargetAmount(0);
   };
 
   const handleChangeBudgetInput = (
@@ -312,7 +337,14 @@ const ManageBudgetPage = () => {
             },
           ]}
         >
-          <p>{`The budget has been ${budget.id ? "updated" : "created"}.`}</p>
+          <p style={{ lineHeight: 1.5 }}>
+            {successMessage.split("\n").map((line, index) => (
+              <span>
+                {line}
+                <br />
+              </span>
+            ))}
+          </p>
         </Modal>
       )}
     </>

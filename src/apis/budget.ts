@@ -37,9 +37,13 @@ interface GetBudgetResponse {
 }
 
 interface GetBudgetRecommendationResponse {
-  categoryId: number;
-  categoryName: string;
-  amount: number;
+  year: number;
+  month: number;
+  budgets: Array<{
+    categoryId: number;
+    categoryName: string;
+    amount: number;
+  }>;
 }
 
 /**
@@ -83,8 +87,15 @@ export const getBudget = async (year: number, month: number) => {
 /**
  * 🚧 예산 추천
  */
-export const getBudgetRecommendation = async () => {
-  const response = await axios.get(`${API_URL}/recommendation`);
+export const getBudgetRecommendation = async (
+  year: number,
+  month: number,
+  totalAmount: number
+) => {
+  const response = await axios.get(
+    `${API_URL}/${year}/${month}/recommendation/`,
+    { params: { totalAmount } }
+  );
 
-  return response as unknown as GetBudgetRecommendationResponse[];
+  return response as unknown as GetBudgetRecommendationResponse;
 };
