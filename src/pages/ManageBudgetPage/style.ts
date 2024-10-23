@@ -57,6 +57,8 @@ export const ButtonGroup = styled.div`
   display: flex;
   justify-content: center;
   gap: 20px;
+  margin-top: auto;
+  margin-bottom: 30px;
 `;
 
 export const RightWrapper = styled.div`
