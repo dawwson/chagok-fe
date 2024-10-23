@@ -141,7 +141,7 @@ const MainLayout = () => {
       </S.Container>
       {isOpen && (
         <Modal
-          type="success"
+          type="info"
           buttons={[
             {
               label: "Cancel",

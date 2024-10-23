@@ -106,8 +106,8 @@ export const Input = styled.input`
   }
 
   &::placeholder {
-    color: ${({ theme }) => theme.text.tertiary}; /* 원하는 색상으로 변경 */
-    opacity: 0.7; /* 투명도 조절 (선택적) */
+    color: ${({ theme }) => theme.text.tertiary};
+    opacity: 0.7;
   }
 
   /* type="number"일 때 스피너 숨기기 */

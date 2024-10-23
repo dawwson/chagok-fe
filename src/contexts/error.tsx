@@ -28,6 +28,21 @@ export const ErrorProvider = ({ children }: Props) => {
 
     switch (errorCode) {
       // 400
+      case "BUDGET_AMOUNT_OUT_OF_RANGE":
+        setErrorMessage(
+          "Please enter a category amount less than or equal to 2 billion."
+        );
+        break;
+      case "BUDGET_TOTAL_AMOUNT_OUT_OF_RANGE":
+        setErrorMessage(
+          "The total budget exceeds the allowed limit of 10 billion. Please adjust your amounts accordingly."
+        );
+        break;
+      case "BUDGET_YEAR_OUT_OF_RANGE":
+        setErrorMessage(
+          "You have reached the limit for budget creation in the selected year and month."
+        );
+        break;
       case "TX_AMOUNT_OUT_OF_RANGE":
         setErrorMessage("Please enter the amount.");
         break;
@@ -51,6 +66,9 @@ export const ErrorProvider = ({ children }: Props) => {
         setErrorMessage("Invalid category.");
         break;
       // 403
+      case "BUDGET_FORBIDDEN":
+        navigateFn?.("/403");
+        break;
       case "TX_FORBIDDEN":
         navigateFn?.("/403");
         break;
