@@ -101,25 +101,31 @@ const ManageBudgetPage = () => {
   };
 
   const handleRecommend = async () => {
-    const recommended = await getBudgetRecommendation(
-      budget.year,
-      budget.month,
-      targetAmount
-    );
+    try {
+      const recommended = await getBudgetRecommendation(
+        budget.year,
+        budget.month,
+        targetAmount
+      );
 
-    if (recommended.budgets.length === 0) {
-      setSuccessMessage(
-        "No recent budget data found.\nPlease set up your budget to start tracking your expenses!"
-      );
-    } else {
-      setSuccessMessage(
-        "Your budget recommendations have been generated!\nCheck them out and adjust as needed."
-      );
-      setBudget({ id: null, ...recommended });
+      if (recommended.budgets.length === 0) {
+        setSuccessMessage(
+          "No recent budget data found.\nPlease set up your budget to start tracking your expenses!"
+        );
+      } else {
+        setSuccessMessage(
+          "Your budget recommendations have been generated!\nCheck them out and adjust as needed."
+        );
+        setBudget({ id: budget.id, ...recommended });
+      }
+      setIsRecommendModalOpen(false);
+      setIsSuccessModalOpen(true);
+      setTargetAmount(0);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        handleApiError(error);
+      }
     }
-    setIsRecommendModalOpen(false);
-    setIsSuccessModalOpen(true);
-    setTargetAmount(0);
   };
 
   const handleChangeBudgetInput = (

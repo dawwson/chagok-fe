@@ -28,14 +28,6 @@ export const ErrorProvider = ({ children }: Props) => {
 
     switch (errorCode) {
       // 400
-      case "TX_AMOUNT_OUT_OF_RANGE":
-        setErrorMessage("Please enter the amount.");
-        break;
-      case "BUDGET_YEAR_OUT_OF_RANGE":
-        setErrorMessage(
-          "You have reached the limit for budget creation in the selected year and month."
-        );
-        break;
       case "BUDGET_AMOUNT_OUT_OF_RANGE":
         setErrorMessage(
           "Please enter a category amount less than or equal to 2 billion."
@@ -45,6 +37,14 @@ export const ErrorProvider = ({ children }: Props) => {
         setErrorMessage(
           "The total budget exceeds the allowed limit of 10 billion. Please adjust your amounts accordingly."
         );
+        break;
+      case "BUDGET_YEAR_OUT_OF_RANGE":
+        setErrorMessage(
+          "You have reached the limit for budget creation in the selected year and month."
+        );
+        break;
+      case "TX_AMOUNT_OUT_OF_RANGE":
+        setErrorMessage("Please enter the amount.");
         break;
       // 401
       case "AUTH_INVALID_TOKEN":
