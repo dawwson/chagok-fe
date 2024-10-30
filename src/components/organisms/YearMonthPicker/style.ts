@@ -30,4 +30,5 @@ export const DateDisplay = styled.div`
   margin: 0 15px;
   font-size: 16px;
   color: ${({ theme }) => theme.text.secondary};
+  text-align: center;
 `;
