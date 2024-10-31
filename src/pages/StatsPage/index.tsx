@@ -9,6 +9,7 @@ import { useError } from "../../contexts/error";
 import BasicButton from "../../components/atoms/BasicButton";
 import BarChart from "../../components/organisms/BarChart";
 import Header from "../../components/organisms/Header";
+import LoadingScreen from "../../components/organisms/LoadingScreen";
 import YearMonthPicker from "../../components/organisms/YearMonthPicker";
 import { ApiError } from "../../types/errorTypes";
 import { capitalize } from "../../utils/string";
@@ -57,6 +58,10 @@ const StatsPage = () => {
   };
 
   const renderBarChart = () => {
+    if (stats.length === 0) {
+      return <LoadingScreen />;
+    }
+
     let leftLabel = "";
     const rightLabel = formatDate(date.year, date.month);
 
