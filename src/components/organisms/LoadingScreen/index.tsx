@@ -4,6 +4,7 @@ import { useTheme } from "styled-components";
 
 export default function LoadingScreen() {
   const theme = useTheme();
+
   return (
     <S.Wrapper>
       <CircularProgress
