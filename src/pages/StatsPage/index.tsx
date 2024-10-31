@@ -1,13 +1,17 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import Header from "../../components/organisms/Header";
-import BasicButton from "../../components/atoms/BasicButton";
-import { useState } from "react";
-import YearMonthPicker from "../../components/organisms/YearMonthPicker";
 import dayjs from "dayjs";
+
+import { getExpenseStat } from "../../apis/stat";
+import { useError } from "../../contexts/error";
+import BasicButton from "../../components/atoms/BasicButton";
 import BarChart from "../../components/organisms/BarChart";
-import { formatDate } from "./util";
-import { testStats } from "./sample";
+import Header from "../../components/organisms/Header";
+import YearMonthPicker from "../../components/organisms/YearMonthPicker";
+import { ApiError } from "../../types/errorTypes";
 import { capitalize } from "../../utils/string";
+
+import { formatDate } from "./util";
 
 type View = "monthly" | "yearly";
 
@@ -24,8 +28,10 @@ interface Stat {
 }
 
 const StatsPage = () => {
+  const { handleApiError } = useError();
+
   const [view, setView] = useState<View>("monthly");
-  const [stats, setStats] = useState<Stat[]>(testStats);
+  const [stats, setStats] = useState<Stat[]>([]);
   const [date, setDate] = useState<Date>({
     year: dayjs().year(),
     month: dayjs().month() + 1,
@@ -81,6 +87,25 @@ const StatsPage = () => {
       />
     );
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const stats = await getExpenseStat({
+          year: date.year,
+          month: date.month,
+          view,
+        });
+        setStats(stats);
+      } catch (error) {
+        if (error instanceof ApiError) {
+          handleApiError(error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [date, view]);
 
   return (
     <Wrapper>
