@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import styled from "styled-components";
 import dayjs from "dayjs";
+
+import * as S from "./style";
+import { formatDate } from "./util";
 
 import { getExpenseStat } from "../../apis/stat";
 import { useError } from "../../contexts/error";
@@ -10,8 +12,6 @@ import Header from "../../components/organisms/Header";
 import YearMonthPicker from "../../components/organisms/YearMonthPicker";
 import { ApiError } from "../../types/errorTypes";
 import { capitalize } from "../../utils/string";
-
-import { formatDate } from "./util";
 
 type View = "monthly" | "yearly";
 
@@ -108,13 +108,13 @@ const StatsPage = () => {
   }, [date, view]);
 
   return (
-    <Wrapper>
-      <TopWrapper>
+    <S.Wrapper>
+      <S.TopWrapper>
         <Header
           title="Statistics"
           description="Check your consumption by category."
         />
-        <ButtonGroup>
+        <S.ButtonGroup>
           <BasicButton
             label="Monthly"
             size="small"
@@ -127,98 +127,29 @@ const StatsPage = () => {
             type={view === "yearly" ? "confirm" : "cancel"}
             onClick={() => setView("yearly")}
           />
-        </ButtonGroup>
-      </TopWrapper>
-      <CenterWrapper>
+        </S.ButtonGroup>
+      </S.TopWrapper>
+      <S.CenterWrapper>
         <YearMonthPicker
           year={date.year}
           month={date.month}
           onChange={handleChangeDate}
         />
-        <ChartContainer>{renderBarChart()}</ChartContainer>
-        <RecapContainer>
-          <RecapTitle>Recap</RecapTitle>
-          <RecapContent>
+        <S.ChartContainer>{renderBarChart()}</S.ChartContainer>
+        <S.RecapContainer>
+          <S.RecapTitle>Recap</S.RecapTitle>
+          <S.RecapContent>
             <li>content1</li>
             <li>content2</li>
             <li>content3</li>
             <li>content1</li>
             <li>content2</li>
             <li>content3</li>
-          </RecapContent>
-        </RecapContainer>
-      </CenterWrapper>
-    </Wrapper>
+          </S.RecapContent>
+        </S.RecapContainer>
+      </S.CenterWrapper>
+    </S.Wrapper>
   );
 };
 
 export default StatsPage;
-
-export const Wrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding-left: 30px;
-`;
-
-export const TopWrapper = styled.div`
-  width: 100%;
-  display: flex;
-`;
-
-export const ButtonGroup = styled.div`
-  display: flex;
-  justify-items: flex-end;
-  align-items: end;
-  gap: 10px;
-  margin-left: auto;
-`;
-
-export const CenterWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background-color: ${({ theme }) => theme.background.white};
-  border-radius: 20px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  gap: 30px;
-`;
-
-export const ChartContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  position: relative;
-  overflow-x: auto;
-`;
-
-export const RecapContainer = styled.div`
-  display: flex;
-  gap: 40px;
-  color: ${({ theme }) => theme.text.secondary};
-`;
-
-export const RecapTitle = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 30px;
-  font-weight: 600;
-`;
-
-export const RecapContent = styled.div`
-  width: 100%;
-  min-height: 50px;
-  max-height: 100px;
-  margin-top: auto;
-  overflow-y: auto;
-
-  li {
-    font-size: 16px;
-    line-height: 2;
-  }
-`;
