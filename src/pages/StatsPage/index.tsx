@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
 import * as S from "./style";
-import { formatDate } from "./util";
+import {
+  formatDate,
+  getCategoryChangeRates,
+  getOverallChangeRate,
+} from "./util";
 
 import { getExpenseStat } from "../../apis/stat";
 import { useError } from "../../contexts/error";
@@ -93,6 +97,88 @@ const StatsPage = () => {
     );
   };
 
+  // TODO: 영어로 바꾸기
+  const renderRecapContent = () => {
+    const { totalPrevious, totalCurrent, totalChange } =
+      getOverallChangeRate(stats);
+
+    let totalChangeMessage = "";
+
+    if (view === "monthly") {
+      if (totalChange === Infinity) {
+        totalChangeMessage = `전월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 새로 발생했습니다.`;
+      } else if (totalChange > 0) {
+        totalChangeMessage = `전월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 ${totalChange}% 증가했습니다.`;
+      } else if (totalChange < 0) {
+        totalChangeMessage = `전월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 ${Math.abs(
+          totalChange
+        )}% 감소했습니다.`;
+      } else {
+        totalChangeMessage = `전월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 동일합니다.`;
+      }
+    } else {
+      if (totalChange === Infinity) {
+        totalChangeMessage = `전년도 동월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 새로 발생했습니다.`;
+      } else if (totalChange > 0) {
+        totalChangeMessage = `전년도 동월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 ${totalChange}% 증가했습니다.`;
+      } else if (totalChange < 0) {
+        totalChangeMessage = `전년도 동월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 ${Math.abs(
+          totalChange
+        )}% 감소했습니다.`;
+      } else {
+        totalChangeMessage = `전년도 동월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 동일합니다.`;
+      }
+    }
+
+    const { newlyCreated, mostIncreased, mostDecreased } =
+      getCategoryChangeRates(stats);
+
+    return (
+      <ul>
+        ✓ 총 지출 변화
+        <li>{totalChangeMessage}</li>
+        <br />
+        {(newlyCreated.length > 0 ||
+          mostIncreased.length > 0 ||
+          mostDecreased.length > 0) &&
+          "카테고리별 변화"}
+        {newlyCreated.length > 0 && (
+          <li>
+            {newlyCreated
+              .map((stat) => capitalize(stat.categoryName))
+              .join(", ")}{" "}
+            카테고리에서 지출이 새로 발생했습니다.
+          </li>
+        )}
+        {mostIncreased.length > 0 && (
+          <li>
+            {view === "monthly" ? "전월 대비 " : "전년도 동월 대비 "}
+            {mostIncreased
+              .map((stat) => `${capitalize(stat.categoryName)} ${stat.change}%`)
+              .join(", ")}
+            로 가장 많이 증가한 카테고리입니다.
+          </li>
+        )}
+        {mostDecreased.length > 0 && (
+          <li>
+            {view === "monthly" ? "전월 대비 " : "전년도 동월 대비 "}{" "}
+            <b>
+              {mostDecreased
+                .map(
+                  (stat) =>
+                    `${capitalize(stat.categoryName)} 카테고리가 ${Math.abs(
+                      stat.change
+                    )}%`
+                )
+                .join(", ")}
+            </b>
+            로 가장 많이 감소한 카테고리입니다.
+          </li>
+        )}
+      </ul>
+    );
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -143,14 +229,7 @@ const StatsPage = () => {
         <S.ChartContainer>{renderBarChart()}</S.ChartContainer>
         <S.RecapContainer>
           <S.RecapTitle>Recap</S.RecapTitle>
-          <S.RecapContent>
-            <li>content1</li>
-            <li>content2</li>
-            <li>content3</li>
-            <li>content1</li>
-            <li>content2</li>
-            <li>content3</li>
-          </S.RecapContent>
+          <S.RecapContent>{renderRecapContent()}</S.RecapContent>
         </S.RecapContainer>
       </S.CenterWrapper>
     </S.Wrapper>

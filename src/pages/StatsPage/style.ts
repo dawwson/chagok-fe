@@ -52,19 +52,24 @@ export const RecapTitle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 30px;
+  font-size: 20px;
   font-weight: 600;
 `;
 
 export const RecapContent = styled.div`
   width: 100%;
-  min-height: 50px;
-  max-height: 100px;
+  min-height: 100px;
+  max-height: 150px;
   margin-top: auto;
   overflow-y: auto;
 
+  ul {
+    list-style-type: disc;
+  }
+
   li {
     font-size: 16px;
-    line-height: 2;
+    line-height: 3;
+    margin: 0 40px;
   }
 `;
