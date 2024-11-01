@@ -27,7 +27,7 @@ const YearMonthPicker = ({ year, month, onChange }: Props) => {
         </svg>
       </S.ArrowButton>
       <S.DateDisplay>
-        {dayjs(new Date(year, month - 1)).format("MMMM YYYY")}
+        {dayjs(new Date(year, month - 1)).format("MMM YYYY")}
       </S.DateDisplay>
       <S.ArrowButton onClick={() => onChange("next")}>
         <svg
