@@ -97,7 +97,6 @@ const StatsPage = () => {
     );
   };
 
-  // TODO: 영어로 바꾸기
   const renderRecapContent = () => {
     const { totalPrevious, totalCurrent, totalChange } =
       getOverallChangeRate(stats);
@@ -106,73 +105,104 @@ const StatsPage = () => {
 
     if (view === "monthly") {
       if (totalChange === Infinity) {
-        totalChangeMessage = `전월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 새로 발생했습니다.`;
+        totalChangeMessage = `Total spending started from 0 won and has newly increased to ${totalCurrent.toLocaleString()} won compared to last year.`;
       } else if (totalChange > 0) {
-        totalChangeMessage = `전월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 ${totalChange}% 증가했습니다.`;
+        totalChangeMessage = `Total spending increased from ${totalPrevious.toLocaleString()} won to ${totalCurrent.toLocaleString()} won, showing a ${totalChange}% increase compared to last month.`;
       } else if (totalChange < 0) {
-        totalChangeMessage = `전월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 ${Math.abs(
+        totalChangeMessage = `Total spending decreased from ${totalPrevious.toLocaleString()} won to ${totalCurrent.toLocaleString()} won, showing a ${Math.abs(
           totalChange
-        )}% 감소했습니다.`;
+        )}% decrease compared to last month.`;
       } else {
-        totalChangeMessage = `전월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 동일합니다.`;
+        totalChangeMessage = `Total spending remains the same at ${totalPrevious.toLocaleString()} won compared to last month.`;
       }
     } else {
       if (totalChange === Infinity) {
-        totalChangeMessage = `전년도 동월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 새로 발생했습니다.`;
+        totalChangeMessage = `Total spending started from 0 won and has newly increased to ${totalCurrent.toLocaleString()} won compared to the same month last year.`;
       } else if (totalChange > 0) {
-        totalChangeMessage = `전년도 동월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 ${totalChange}% 증가했습니다.`;
+        totalChangeMessage = `Total spending increased from ${totalPrevious.toLocaleString()} won to ${totalCurrent.toLocaleString()} won, showing a ${totalChange}% increase compared to the same month last year.`;
       } else if (totalChange < 0) {
-        totalChangeMessage = `전년도 동월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 ${Math.abs(
+        totalChangeMessage = `Total spending decreased from ${totalPrevious.toLocaleString()} won to ${totalCurrent.toLocaleString()} won, showing a ${Math.abs(
           totalChange
-        )}% 감소했습니다.`;
+        )}% decrease compared to the same month last year.`;
       } else {
-        totalChangeMessage = `전년도 동월 대비 총 지출이 ${totalPrevious.toLocaleString()}원에서 ${totalCurrent.toLocaleString()}원으로 동일합니다.`;
+        totalChangeMessage = `Total spending remains the same at ${totalPrevious.toLocaleString()} won compared to the same month last year.`;
       }
     }
 
     const { newlyCreated, mostIncreased, mostDecreased } =
       getCategoryChangeRates(stats);
 
+    const isDisplayed =
+      newlyCreated.length > 0 ||
+      mostIncreased.categoryNames.length > 0 ||
+      mostDecreased.categoryNames.length > 0;
+
     return (
       <ul>
-        ✓ 총 지출 변화
+        ✓ Changes in Total Expenses
+        <br />
+        <br />
         <li>{totalChangeMessage}</li>
         <br />
-        {(newlyCreated.length > 0 ||
-          mostIncreased.length > 0 ||
-          mostDecreased.length > 0) &&
-          "카테고리별 변화"}
+        <br />
+        {isDisplayed && "✓ Changes by Category"}
+        <br />
+        <br />
         {newlyCreated.length > 0 && (
           <li>
+            Spending has newly occurred in the following categories:{" "}
             {newlyCreated
-              .map((stat) => capitalize(stat.categoryName))
-              .join(", ")}{" "}
-            카테고리에서 지출이 새로 발생했습니다.
-          </li>
-        )}
-        {mostIncreased.length > 0 && (
-          <li>
-            {view === "monthly" ? "전월 대비 " : "전년도 동월 대비 "}
-            {mostIncreased
-              .map((stat) => `${capitalize(stat.categoryName)} ${stat.change}%`)
+              .map((categoryName, index) => {
+                const isLast = index > 0 && index === newlyCreated.length - 1;
+
+                if (isLast) {
+                  return `and ${capitalize(categoryName)}`;
+                } else {
+                  return capitalize(categoryName);
+                }
+              })
               .join(", ")}
-            로 가장 많이 증가한 카테고리입니다.
+            .
           </li>
         )}
-        {mostDecreased.length > 0 && (
+        {mostIncreased.categoryNames.length > 0 && (
           <li>
-            {view === "monthly" ? "전월 대비 " : "전년도 동월 대비 "}{" "}
-            <b>
-              {mostDecreased
-                .map(
-                  (stat) =>
-                    `${capitalize(stat.categoryName)} 카테고리가 ${Math.abs(
-                      stat.change
-                    )}%`
-                )
-                .join(", ")}
-            </b>
-            로 가장 많이 감소한 카테고리입니다.
+            The categories with the highest increase
+            {mostIncreased.categoryNames.length === 1 ? " is " : " are "}
+            {mostIncreased.categoryNames
+              .map((categoryName, index) => {
+                const isLast =
+                  index > 0 && index === mostIncreased.categoryNames.length - 1;
+
+                if (isLast) {
+                  return `and ${capitalize(categoryName)}`;
+                } else {
+                  return capitalize(categoryName);
+                }
+              })
+              .join(", ")}
+            , with an increase of {mostIncreased.change}% compared to
+            {view === "monthly" ? " last month." : " the same month last year."}
+          </li>
+        )}
+        {mostDecreased.categoryNames.length > 0 && (
+          <li>
+            The categories with the highest decrease
+            {mostDecreased.categoryNames.length === 1 ? " is " : " are "}
+            {mostDecreased.categoryNames
+              .map((categoryName, index) => {
+                const isLast =
+                  index > 0 && index === mostDecreased.categoryNames.length - 1;
+
+                if (isLast) {
+                  return `and ${capitalize(categoryName)}`;
+                } else {
+                  return capitalize(categoryName);
+                }
+              })
+              .join(", ")}
+            , with a decrease of {mostIncreased.change}% compared to
+            {view === "monthly" ? " last month." : " the same month last year."}
           </li>
         )}
       </ul>

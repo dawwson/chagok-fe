@@ -69,7 +69,7 @@ export const RecapContent = styled.div`
 
   li {
     font-size: 16px;
-    line-height: 3;
+    line-height: 2;
     margin: 0 40px;
   }
 `;

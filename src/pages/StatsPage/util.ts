@@ -21,7 +21,7 @@ interface StatWithChange extends Stat {
  * @returns
  */
 export const getCategoryChangeRates = (stats: Stat[]) => {
-  const newlyCreated: StatWithChange[] = [];
+  const newlyCreated: string[] = [];
   const increased: StatWithChange[] = [];
   const decreased: StatWithChange[] = [];
 
@@ -34,7 +34,7 @@ export const getCategoryChangeRates = (stats: Stat[]) => {
     );
 
     if (change === Infinity) {
-      newlyCreated.push({ ...stat, change });
+      newlyCreated.push(stat.categoryName);
     } else if (change > 0) {
       increased.push({ ...stat, change });
       maxChange = change > maxChange ? change : maxChange;
@@ -46,8 +46,18 @@ export const getCategoryChangeRates = (stats: Stat[]) => {
 
   return {
     newlyCreated,
-    mostIncreased: increased.filter(({ change }) => change === maxChange),
-    mostDecreased: decreased.filter(({ change }) => change === minChange),
+    mostIncreased: {
+      categoryNames: increased
+        .filter(({ change }) => change === maxChange)
+        .map((stat) => stat.categoryName),
+      change: maxChange,
+    },
+    mostDecreased: {
+      categoryNames: decreased
+        .filter(({ change }) => change === minChange)
+        .map((stat) => stat.categoryName),
+      change: minChange,
+    },
   };
 };
 
