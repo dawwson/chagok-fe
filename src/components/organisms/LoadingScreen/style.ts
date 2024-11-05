@@ -6,7 +6,3 @@ export const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
-export const Text = styled.span`
-  font-size: 30px;
-`;

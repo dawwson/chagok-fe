@@ -197,6 +197,7 @@ const ManageTransactionPage = () => {
           const txDetail = await getTxDetail(txId);
           setTx(txDetail);
         }
+        setIsLoading(false);
       } catch (error) {
         if (error instanceof ApiError) {
           handleApiError(error, navigate);
@@ -204,16 +205,10 @@ const ManageTransactionPage = () => {
       }
     };
 
-    const timeoutId = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
     fetchData();
-
-    return () => clearTimeout(timeoutId);
   }, [isEditPage, txId]);
 
-  if (isEditPage && isLoading) {
+  if (isLoading) {
     return <LoadingScreen />;
   }
 
