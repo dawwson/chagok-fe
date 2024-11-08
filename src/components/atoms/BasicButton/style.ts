@@ -7,7 +7,7 @@ export const Button = styled.button<{
   display: flex; /* Flexbox 사용 */
   justify-content: center; /* 수평 중앙 정렬 */
   align-items: center; /* 수직 중앙 정렬 */
-  width: 90px;
+  min-width: 90px;
   height: ${({ size }) => (size === "small" ? "30px" : "40px")};
   font-size: ${({ size }) => (size === "small" ? "14px" : "18px")};
   font-weight: 600;
