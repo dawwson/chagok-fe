@@ -18,10 +18,23 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin-top: 40px;
+  margin: 40px 0px 60px 0px;
+
+  p {
+    line-height: 1.2;
+    color: ${({ theme }) => theme.text.secondary};
+  }
+
+  span {
+    font-weight: 600;
+  }
+
+  i {
+    font-style: italic;
+  }
 `;
 
-export const SubTitle = styled.label`
+export const SubTitle = styled.h1`
   display: inline-block;
   font-size: 20px;
   font-weight: 700;

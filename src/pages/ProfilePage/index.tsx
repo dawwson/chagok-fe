@@ -5,6 +5,8 @@ import Header from "../../components/organisms/Header";
 import BasicButton from "../../components/atoms/BasicButton";
 import LoadingScreen from "../../components/organisms/LoadingScreen";
 
+const CONFIRMATION_PHRASE = "delete my account";
+
 interface Profile {
   email: string;
   nickname: string;
@@ -25,6 +27,10 @@ const ProfilePage = () => {
     newPassword: "",
     confirmNewPassword: "",
   });
+  const [deleteAccount, setDeleteAccount] = useState({
+    email: "",
+    phrase: "",
+  });
 
   // === profile ===
   const handleChangeProfileInput = (
@@ -32,9 +38,7 @@ const ProfilePage = () => {
   ) => {
     const { name, value } = event.target;
 
-    if (name === "email") {
-      setProfile({ ...profile, email: value });
-    } else if (name === "nickname") {
+    if (name === "nickname") {
       setProfile({ ...profile, nickname: value });
     } else {
       return;
@@ -67,6 +71,18 @@ const ProfilePage = () => {
   };
 
   // === delete account ===
+  const handleDeleteAccountInput = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = event.target;
+
+    if (name === "deleteAccountEmail") {
+      setDeleteAccount({ ...deleteAccount, email: value });
+    } else if (name === "confirmationPhrase") {
+      setDeleteAccount({ ...deleteAccount, phrase: value });
+    }
+  };
+
   const handleDeleteAccount = () => {
     // TODO: 회원 탈퇴 API 연동
   };
@@ -98,7 +114,12 @@ const ProfilePage = () => {
       <S.ScrollableWrapper>
         <S.Container>
           <S.SubTitle>Profile</S.SubTitle>
-          <S.Input type="text" name="email" value={profile.email} disabled />
+          <S.Input
+            type="text"
+            name="profileEmail"
+            value={profile.email}
+            disabled
+          />
           <S.Input
             type="text"
             name="nickname"
@@ -163,15 +184,39 @@ const ProfilePage = () => {
         </S.Container>
         <S.Container>
           <S.SubTitle className="delete-account">Delete Account</S.SubTitle>
-          <S.DeleteAccountDescription>
+          <p>
             <span>Warning: Deleting your account is permanent. </span>Once your
             account is deleted, all your data will be lost and cannot be
             recovered. Please make sure you want to proceed before taking this
             action.
-          </S.DeleteAccountDescription>
+          </p>
           {!hidden.deleteAccount && (
             <>
-              <p>test</p>
+              <p>
+                <span>Are you sure you want to delete your account?</span>
+              </p>
+              <p>Your email : </p>
+              <S.Input
+                type="text"
+                name="deleteAccountEmail"
+                value={deleteAccount.email}
+                placeholder="Email"
+                onChange={handleDeleteAccountInput}
+              />
+              <p>
+                To verify, type{" "}
+                <span>
+                  <i>"{CONFIRMATION_PHRASE}"</i>
+                </span>{" "}
+                below:
+              </p>
+              <S.Input
+                type="text"
+                name="confirmationPhrase"
+                value={deleteAccount.phrase}
+                placeholder="Confirmation phrase"
+                onChange={handleDeleteAccountInput}
+              />
             </>
           )}
           <S.ButtonWrapper>
