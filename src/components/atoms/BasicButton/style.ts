@@ -2,7 +2,7 @@ import { styled } from "styled-components";
 
 export const Button = styled.button<{
   size: "small" | "large";
-  type: "confirm" | "cancel" | "danger";
+  type: "default" | "confirm" | "cancel" | "danger";
 }>`
   display: flex; /* Flexbox 사용 */
   justify-content: center; /* 수평 중앙 정렬 */
@@ -25,6 +25,9 @@ export const Button = styled.button<{
     if (type === "danger") {
       return theme.button.danger;
     }
+    if (type === "default") {
+      return theme.button.tertiary;
+    }
   }};
   color: ${({ theme, type }) => {
     if (type === "confirm") {
@@ -43,5 +46,9 @@ export const Button = styled.button<{
 
   &:hover {
     opacity: 0.8;
+  }
+
+  &:disabled {
+    opacity: 0.6;
   }
 `;
