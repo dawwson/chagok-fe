@@ -27,7 +27,8 @@ export const ErrorProvider = ({ children }: Props) => {
     const { errorCode } = error;
 
     switch (errorCode) {
-      // 400
+      // ===== 400 =====
+      // budget
       case "BUDGET_AMOUNT_OUT_OF_RANGE":
         setErrorMessage(
           "Please enter a category amount less than or equal to 2 billion."
@@ -43,10 +44,13 @@ export const ErrorProvider = ({ children }: Props) => {
           "You have reached the limit for budget creation in the selected year and month."
         );
         break;
+      // tx
       case "TX_AMOUNT_OUT_OF_RANGE":
         setErrorMessage("Please enter the amount.");
         break;
-      // 401
+      // user
+
+      // ===== 401 =====
       case "AUTH_INVALID_TOKEN":
         deauthenticate();
         navigateFn?.("/login", { replace: true });
@@ -61,18 +65,21 @@ export const ErrorProvider = ({ children }: Props) => {
           "The password you entered is incorrect.\nPlease try again."
         );
         break;
-      // 404
-      case "CATEGORY_NOT_FOUND":
-        setErrorMessage("Invalid category.");
-        break;
-      // 403
+
+      // ===== 403 =====
       case "BUDGET_FORBIDDEN":
         navigateFn?.("/403");
         break;
       case "TX_FORBIDDEN":
         navigateFn?.("/403");
         break;
-      // 409
+
+      // ===== 404 =====
+      case "CATEGORY_NOT_FOUND":
+        setErrorMessage("Invalid category.");
+        break;
+
+      // ===== 409 =====
       case "USER_EMAIL_IS_DUPLICATED":
         setErrorMessage(
           "This email address cannot be used.\nPlease try a different one."

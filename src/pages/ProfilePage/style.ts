@@ -45,21 +45,33 @@ export const SubTitle = styled.h1`
   }
 `;
 
-export const Input = styled.input`
+export const InputWrapper = styled.div``;
+
+export const Input = styled.input<{ $error: boolean }>`
   width: 100%;
   padding: 16px 20px;
   border-radius: 50px;
-  border: 2px solid ${({ theme }) => theme.button.secondary};
+  border: 2px solid
+    ${({ theme, $error }) =>
+      $error ? theme.button.danger : theme.button.secondary};
   outline: none;
   font-size: 16px;
 
   &:focus {
-    border: 2px solid ${({ theme }) => theme.button.primary};
+    border: 2px solid
+      ${({ theme, $error }) =>
+        $error ? theme.button.danger : theme.button.primary};
   }
 
   &:disabled {
     background-color: ${({ theme }) => theme.button.secondary};
   }
+`;
+
+export const ErrorText = styled.p`
+  color: ${({ theme }) => theme.text.danger} !important;
+  font-size: 14px;
+  margin: 8px;
 `;
 
 export const ButtonWrapper = styled.div`
