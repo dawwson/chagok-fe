@@ -2,12 +2,12 @@ import { styled } from "styled-components";
 
 export const Button = styled.button<{
   size: "small" | "large";
-  type: "confirm" | "cancel" | "danger";
+  type: "default" | "confirm" | "cancel" | "danger";
 }>`
   display: flex; /* Flexbox 사용 */
   justify-content: center; /* 수평 중앙 정렬 */
   align-items: center; /* 수직 중앙 정렬 */
-  width: 90px;
+  min-width: 90px;
   height: ${({ size }) => (size === "small" ? "30px" : "40px")};
   font-size: ${({ size }) => (size === "small" ? "14px" : "18px")};
   font-weight: 600;
@@ -24,6 +24,9 @@ export const Button = styled.button<{
     }
     if (type === "danger") {
       return theme.button.danger;
+    }
+    if (type === "default") {
+      return theme.button.tertiary;
     }
   }};
   color: ${({ theme, type }) => {
@@ -43,5 +46,9 @@ export const Button = styled.button<{
 
   &:hover {
     opacity: 0.8;
+  }
+
+  &:disabled {
+    opacity: 0.6;
   }
 `;

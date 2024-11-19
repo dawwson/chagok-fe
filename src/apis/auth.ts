@@ -46,4 +46,7 @@ export const signOut = async () => {
   await axios.post(`${API_URL}/sign-out`);
 };
 
-// TODO: 회원 탈퇴
+// 회원 탈퇴
+export const deleteUser = async (email: string) => {
+  await axios.post(`${API_URL}/delete-account`, { email });
+};
