@@ -149,6 +149,10 @@ const ProfilePage = () => {
       return;
     }
 
+    if (newPassword !== confirmNewPassword) {
+      return;
+    }
+
     try {
       await updateUserPassword(password.oldPassword, password.newPassword);
       setSuccessModal({
@@ -313,7 +317,8 @@ const ProfilePage = () => {
                   disabled={
                     password.oldPassword === "" ||
                     password.newPassword === "" ||
-                    password.confirmNewPassword === ""
+                    password.confirmNewPassword === "" ||
+                    password.newPassword !== password.confirmNewPassword
                   }
                   onClick={handleUpdatePassword}
                 />
