@@ -8,6 +8,6 @@ export const saveSelectedDate = (date: string) => {
   sessionStorage.setItem(INITIAL_DATE_KEY, date);
 };
 
-export const removeSelectedDate = (date: string) => {
+export const removeSelectedDate = () => {
   sessionStorage.removeItem(INITIAL_DATE_KEY);
 };
