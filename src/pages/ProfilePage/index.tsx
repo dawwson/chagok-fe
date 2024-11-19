@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import * as S from "./style";
 import Header from "../../components/organisms/Header";
 import BasicButton from "../../components/atoms/BasicButton";
-import LoadingScreen from "../../components/organisms/LoadingScreen";
+import { deleteUser } from "../../apis/auth";
 import {
   getUser,
   updateUserPassword,
   updateUserProfile,
 } from "../../apis/user";
+import { useAuth } from "../../contexts/auth";
 import Modal from "../../components/organisms/Modal";
 import { useError } from "../../contexts/error";
 import { ApiError } from "../../types/errorTypes";
@@ -21,14 +22,19 @@ interface Profile {
 }
 
 const ProfilePage = () => {
+  const { deauthenticate } = useAuth();
   const { handleApiError } = useError();
-  const [isLoading, setIsLoading] = useState(false);
-  const [modal, setModal] = useState({
+  const [successModal, setSuccessModal] = useState({
+    isOpen: false,
+    message: "",
+    onClose: () => {},
+  });
+  const [warningModal, setWarningModal] = useState({
     isOpen: false,
     message: "",
   });
   const [hidden, setHidden] = useState({
-    updatePassword: false,
+    updatePassword: true,
     deleteAccount: true,
   });
   const [profile, setProfile] = useState<Profile>({
@@ -88,9 +94,11 @@ const ProfilePage = () => {
   const handleUpdateProfile = async () => {
     try {
       await updateUserProfile({ nickname: profile.nickname });
-      setModal({
+      setSuccessModal({
         isOpen: true,
         message: "Your profile has been successfully updated.",
+        onClose: () =>
+          setSuccessModal({ isOpen: false, message: "", onClose: () => {} }),
       });
     } catch (error) {
       if (error instanceof ApiError) {
@@ -140,9 +148,11 @@ const ProfilePage = () => {
 
     try {
       await updateUserPassword(password.oldPassword, password.newPassword);
-      setModal({
+      setSuccessModal({
         isOpen: true,
         message: "Your password has been successfully changed.",
+        onClose: () =>
+          setSuccessModal({ isOpen: false, message: "", onClose: () => {} }),
       });
       setPassword({
         oldPassword: "",
@@ -169,8 +179,22 @@ const ProfilePage = () => {
     }
   };
 
-  const handleDeleteAccount = () => {
-    // TODO: 회원 탈퇴 API 연동
+  const handleDeleteAccount = async () => {
+    try {
+      await deleteUser(deleteAccount.email);
+
+      setWarningModal({ isOpen: false, message: "" });
+      setSuccessModal({
+        isOpen: true,
+        message:
+          "Your account has been successfully deleted.\nThank you for using our service! 👋",
+        onClose: () => deauthenticate(),
+      });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        handleApiError(error);
+      }
+    }
   };
 
   useEffect(() => {
@@ -181,10 +205,6 @@ const ProfilePage = () => {
 
     fetchData();
   }, []);
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
 
   return (
     <>
@@ -311,7 +331,7 @@ const ProfilePage = () => {
                 <p>
                   <span>Are you sure you want to delete your account?</span>
                 </p>
-                <p>Your email : </p>
+                <p>Your email: </p>
                 <S.Input
                   type="text"
                   name="deleteAccountEmail"
@@ -354,9 +374,16 @@ const ProfilePage = () => {
                   label="Delete your account"
                   size="small"
                   type="danger"
-                  onClick={handleDeleteAccount}
+                  onClick={() =>
+                    setWarningModal({
+                      isOpen: true,
+                      message:
+                        "Your account will be retained for 7 days before permanent deletion. If you wish to recover it, please act within this period.",
+                    })
+                  }
                   disabled={
-                    deleteAccount.email === "" || deleteAccount.phrase === ""
+                    deleteAccount.email === "" ||
+                    deleteAccount.phrase !== CONFIRMATION_PHRASE
                   }
                 />
               )}
@@ -364,18 +391,37 @@ const ProfilePage = () => {
           </S.Container>
         </S.ScrollableWrapper>
       </S.Wrapper>
-      {modal.isOpen && (
+      {successModal.isOpen && (
         <Modal
           type="success"
           buttons={[
             {
               label: "OK",
               location: "center",
-              onClick: () => setModal({ isOpen: false, message: "" }),
+              onClick: successModal.onClose,
             },
           ]}
         >
-          <p style={{ lineHeight: "1.5" }}>{modal.message}</p>
+          <p style={{ lineHeight: "1.5" }}>{successModal.message}</p>
+        </Modal>
+      )}
+      {warningModal.isOpen && (
+        <Modal
+          type="warn"
+          buttons={[
+            {
+              label: "Cancel",
+              location: "left",
+              onClick: () => setWarningModal({ isOpen: false, message: "" }),
+            },
+            {
+              label: "Proceed",
+              location: "right",
+              onClick: handleDeleteAccount,
+            },
+          ]}
+        >
+          <p style={{ lineHeight: "1.5" }}>{warningModal.message}</p>
         </Modal>
       )}
     </>
