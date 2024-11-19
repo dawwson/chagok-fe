@@ -22,7 +22,7 @@ interface Profile {
 }
 
 const ProfilePage = () => {
-  const { deauthenticate } = useAuth();
+  const { authenticate, deauthenticate } = useAuth();
   const { handleApiError } = useError();
   const [successModal, setSuccessModal] = useState({
     isOpen: false,
@@ -93,13 +93,16 @@ const ProfilePage = () => {
 
   const handleUpdateProfile = async () => {
     try {
-      await updateUserProfile({ nickname: profile.nickname });
+      const updatedUser = await updateUserProfile({
+        nickname: profile.nickname,
+      });
       setSuccessModal({
         isOpen: true,
         message: "Your profile has been successfully updated.",
         onClose: () =>
           setSuccessModal({ isOpen: false, message: "", onClose: () => {} }),
       });
+      authenticate({ id: updatedUser.id, nickname: updatedUser.nickname });
     } catch (error) {
       if (error instanceof ApiError) {
         handleApiError(error);

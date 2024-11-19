@@ -8,6 +8,12 @@ interface GetUserResponse {
   nickname: string;
 }
 
+interface UpdateUserProfileResponse {
+  id: string;
+  email: string;
+  nickname: string;
+}
+
 /**
  * 사용자 조회
  */
@@ -21,7 +27,9 @@ export const getUser = async () => {
  * 사용자 프로필 수정
  */
 export const updateUserProfile = async ({ nickname }: { nickname: string }) => {
-  await axios.patch(`${API_URL}/profile`, { nickname });
+  const response = await axios.patch(`${API_URL}/profile`, { nickname });
+
+  return response as unknown as UpdateUserProfileResponse;
 };
 
 /**
