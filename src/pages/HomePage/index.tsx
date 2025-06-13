@@ -90,7 +90,9 @@ const HomePage = () => {
           title={`🧾 차곡차곡... ${currentUser?.nickname}님의 ${
             selectedDate.get("M") + 1
           }월 가계부`}
-          description={` 🔵 수입 ‣ ${sum?.totalIncome.toLocaleString()}원\n\n 🔴 지출 ‣ ${sum?.totalExpense.toLocaleString()}원`}
+          description={` 🔵 수입 ‣ ${
+            sum?.totalIncome.toLocaleString() ?? 0
+          }원\n\n 🔴 지출 ‣ ${sum?.totalExpense.toLocaleString() ?? 0}원`}
         />
         <S.CalendarContainer>
           <Calendar selectedDate={selectedDate} onChange={handleChangeDate} />
