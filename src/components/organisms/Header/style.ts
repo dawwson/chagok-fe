@@ -16,4 +16,5 @@ export const Description = styled.p`
   color: ${({ theme }) => theme.text.secondary};
   font-size: 16px;
   font-weight: 400;
+  white-space: pre-wrap; // 공백 표시
 `;

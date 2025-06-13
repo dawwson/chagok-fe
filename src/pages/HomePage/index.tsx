@@ -87,12 +87,10 @@ const HomePage = () => {
     <S.Wrapper>
       <S.LeftWrapper>
         <Header
-          title={`Welcome to Chagok, ${currentUser?.nickname}!`}
-          description={`🔖 Income : ${"\u00A0"}₩${
-            sum?.totalIncome.toLocaleString() ?? 0
-          }${"\u00A0\u00A0\u00A0"}Expense : ₩${
-            sum?.totalExpense.toLocaleString() ?? 0
-          }`}
+          title={`🧾 차곡차곡... ${currentUser?.nickname}님의 ${
+            selectedDate.get("M") + 1
+          }월 가계부`}
+          description={` 🔵 수입 ‣ ${sum?.totalIncome.toLocaleString()}원\n\n 🔴 지출 ‣ ${sum?.totalExpense.toLocaleString()}원`}
         />
         <S.CalendarContainer>
           <Calendar selectedDate={selectedDate} onChange={handleChangeDate} />
@@ -100,11 +98,13 @@ const HomePage = () => {
       </S.LeftWrapper>
       <S.RightWrapper>
         <S.ButtonContainer>
-          <S.AddButton onClick={handleClickAdd}>Add a transaction</S.AddButton>
+          <S.AddButton onClick={handleClickAdd}>내역 추가하기</S.AddButton>
         </S.ButtonContainer>
         <S.ListItemContainer>
           {txs.length === 0 ? (
-            <S.Empty>Try to add a new transaction!</S.Empty>
+            <S.Empty>
+              이 날짜에는 내역이 없어요. 새로운 내역을 추가해보세요!
+            </S.Empty>
           ) : (
             txs.map((tx) => (
               <S.ListItem
