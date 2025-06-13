@@ -53,12 +53,12 @@ const JoinPage = () => {
 
   return (
     <S.Wrapper>
-      <S.Title>Join to Chagok 💰</S.Title>
+      <S.Title>회원가입</S.Title>
       <S.Form onSubmit={handleOnSubmit}>
         <S.Input
           name="email"
           value={email}
-          placeholder="Email"
+          placeholder="이메일"
           type="email"
           onChange={handleOnChange}
           required
@@ -66,7 +66,7 @@ const JoinPage = () => {
         <S.Input
           name="password"
           value={password}
-          placeholder="Password"
+          placeholder="비밀번호"
           type="password"
           onChange={handleOnChange}
           required
@@ -74,18 +74,18 @@ const JoinPage = () => {
         <S.Input
           name="nickname"
           value={nickname}
-          placeholder="Nickname"
+          placeholder="닉네임"
           onChange={handleOnChange}
           required
           minLength={2}
         />
         <S.Input
           type="submit"
-          value={isLoading ? "Loading..." : "Sign up with Email"}
+          value={isLoading ? "Loading..." : "이메일로 회원가입"}
         />
       </S.Form>
       <S.Switcher>
-        Already have an account? <Link to="/login">Login &rarr;</Link>
+        이미 계정이 있으신가요? <Link to="/login">로그인하기 &rarr;</Link>
       </S.Switcher>
     </S.Wrapper>
   );

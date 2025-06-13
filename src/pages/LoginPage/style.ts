@@ -49,8 +49,10 @@ export const Input = styled.input`
 
 export const Switcher = styled.span`
   margin-top: 20px;
+  color: ${({ theme }) => theme.text.secondary};
 
   a {
     color: ${({ theme }) => theme.text.accent};
+    font-weight: 700;
   }
 `;

@@ -49,12 +49,12 @@ const LoginPage = () => {
 
   return (
     <S.Wrapper>
-      <S.Title>Log in to Chagok 💰</S.Title>
+      <S.Title>로그인</S.Title>
       <S.Form onSubmit={handleOnSubmit}>
         <S.Input
           name="email"
           value={email}
-          placeholder="Email"
+          placeholder="이메일"
           type="email"
           onChange={handleOnChange}
           required
@@ -62,18 +62,18 @@ const LoginPage = () => {
         <S.Input
           name="password"
           value={password}
-          placeholder="Password"
+          placeholder="비밀번호"
           type="password"
           onChange={handleOnChange}
           required
         />
         <S.Input
           type="submit"
-          value={isLoading ? "Loading..." : "Sign in with Email"}
+          value={isLoading ? "Loading..." : "이메일로 로그인하기"}
         />
       </S.Form>
       <S.Switcher>
-        Don't have an account? <Link to="/join">Join &rarr;</Link>
+        계정이 없으신가요? <Link to="/join">가입하기 &rarr;</Link>
       </S.Switcher>
     </S.Wrapper>
   );
