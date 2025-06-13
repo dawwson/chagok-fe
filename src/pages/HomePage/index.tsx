@@ -87,7 +87,7 @@ const HomePage = () => {
     <S.Wrapper>
       <S.LeftWrapper>
         <Header
-          title={`🧾 차곡차곡... ${currentUser?.nickname}님의 ${
+          title={`차곡차곡, ${currentUser?.nickname}님의 ${
             selectedDate.get("M") + 1
           }월 가계부`}
           description={` 🔵 수입 ‣ ${
