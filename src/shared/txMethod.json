@@ -1,0 +1,30 @@
+[
+  {
+    "name": "cash",
+    "labels": {
+      "ko": "현금",
+      "en": "Cash"
+    }
+  },
+  {
+    "name": "debit card",
+    "labels": {
+      "ko": "체크카드",
+      "en": "Debit Card"
+    }
+  },
+  {
+    "name": "credit card",
+    "labels": {
+      "ko": "신용카드",
+      "en": "Credit Card"
+    }
+  },
+  {
+    "name": "bank transfer",
+    "labels": {
+      "ko": "계좌이체",
+      "en": "Bank Transfer"
+    }
+  }
+]

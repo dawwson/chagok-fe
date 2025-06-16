@@ -1,0 +1,16 @@
+[
+  {
+    "name": "income",
+    "labels": {
+      "ko": "수입",
+      "en": "Income"
+    }
+  },
+  {
+    "name": "expense",
+    "labels": {
+      "ko": "지출",
+      "en": "Expense"
+    }
+  }
+]
