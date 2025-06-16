@@ -13,6 +13,8 @@ import { useAuth } from "../../contexts/auth";
 import Modal from "../../components/organisms/Modal";
 import { useError } from "../../contexts/error";
 import { ApiError } from "../../types/errorTypes";
+import { t } from "../../i18n/interpolate";
+import ko from "../../i18n/locale/ko";
 
 const CONFIRMATION_PHRASE = "delete my account";
 
@@ -22,6 +24,8 @@ interface Profile {
 }
 
 const ProfilePage = () => {
+  const locale = ko.profile;
+
   const { authenticate, deauthenticate } = useAuth();
   const { handleApiError } = useError();
   const [successModal, setSuccessModal] = useState({
@@ -136,7 +140,7 @@ const ProfilePage = () => {
           ...errors.password,
           confirmNewPassword: isMatched
             ? ""
-            : "The new password and confirmation password do not match.",
+            : t(locale.updatePassword.text.error),
         },
       });
     }
@@ -216,11 +220,11 @@ const ProfilePage = () => {
   return (
     <>
       <S.Wrapper>
-        <Header title="Edit Profile" description="Edit your information." />
+        <Header title={t(locale.title)} description={t(locale.description)} />
         <S.ScrollableWrapper>
           {/* ⭐️ Profile ⭐️ */}
           <S.Container>
-            <S.SubTitle>Profile</S.SubTitle>
+            <S.SubTitle>{t(locale.updateProfile.subTitle)}</S.SubTitle>
             <S.InputWrapper>
               <S.Input
                 type="text"
@@ -235,7 +239,7 @@ const ProfilePage = () => {
               <S.Input
                 type="text"
                 name="nickname"
-                placeholder="Nickname"
+                placeholder={t(locale.updateProfile.placeholder.nickname)}
                 value={profile.nickname}
                 onChange={handleChangeProfileInput}
                 $error={!!errors.profile.nickname}
@@ -244,7 +248,7 @@ const ProfilePage = () => {
             </S.InputWrapper>
             <S.ButtonWrapper>
               <BasicButton
-                label="Update profile"
+                label={t(locale.updateProfile.button.update)}
                 size="small"
                 type="confirm"
                 onClick={handleUpdateProfile}
@@ -254,14 +258,16 @@ const ProfilePage = () => {
           </S.Container>
           {/* ⭐️ Password ⭐️ */}
           <S.Container>
-            <S.SubTitle>Password</S.SubTitle>
+            <S.SubTitle>{t(locale.updatePassword.subTitle)}</S.SubTitle>
             {!hidden.updatePassword && (
               <>
                 <S.InputWrapper>
                   <S.Input
                     type="password"
                     name="oldPassword"
-                    placeholder="Old password"
+                    placeholder={t(
+                      locale.updatePassword.placeholder.oldPassword
+                    )}
                     value={password.oldPassword}
                     onChange={handleChangePasswordInput}
                     $error={!!errors.password.oldPassword}
@@ -273,7 +279,9 @@ const ProfilePage = () => {
                   <S.Input
                     type="password"
                     name="newPassword"
-                    placeholder="New password"
+                    placeholder={t(
+                      locale.updatePassword.placeholder.newPassword
+                    )}
                     value={password.newPassword}
                     onChange={handleChangePasswordInput}
                     $error={!!errors.password.newPassword}
@@ -285,7 +293,9 @@ const ProfilePage = () => {
                   <S.Input
                     type="password"
                     name="confirmNewPassword"
-                    placeholder="Confirm new password"
+                    placeholder={t(
+                      locale.updatePassword.placeholder.confirmPassword
+                    )}
                     value={password.confirmNewPassword}
                     onChange={handleChangePasswordInput}
                     $error={!!errors.password.confirmNewPassword}
@@ -299,7 +309,11 @@ const ProfilePage = () => {
             )}
             <S.ButtonWrapper>
               <BasicButton
-                label={hidden.updatePassword ? "Show" : "Hide"}
+                label={
+                  hidden.updatePassword
+                    ? t(locale.updatePassword.button.show)
+                    : t(locale.updatePassword.button.hide)
+                }
                 size="small"
                 type={hidden.updatePassword ? "confirm" : "default"}
                 onClick={() =>
@@ -311,7 +325,7 @@ const ProfilePage = () => {
               />
               {!hidden.updatePassword && (
                 <BasicButton
-                  label="Update password"
+                  label={t(locale.updatePassword.button.update)}
                   size="small"
                   type="confirm"
                   disabled={
@@ -327,19 +341,15 @@ const ProfilePage = () => {
           </S.Container>
           {/* ⭐️ Delete Account ⭐️ */}
           <S.Container>
-            <S.SubTitle className="delete-account">Delete Account</S.SubTitle>
+            <S.SubTitle className="delete-account">
+              {t(locale.deleteAccount.subTitle)}
+            </S.SubTitle>
             <p>
-              <span>Warning: Deleting your account is permanent. </span>Once
-              your account is deleted, all your data will be lost and cannot be
-              recovered. Please make sure you want to proceed before taking this
-              action.
+              <span>{t(locale.deleteAccount.text.warning)}</span>
             </p>
             {!hidden.deleteAccount && (
               <>
-                <p>
-                  <span>Are you sure you want to delete your account?</span>
-                </p>
-                <p>Your email: </p>
+                <p>{t(locale.deleteAccount.label.email)}</p>
                 <S.Input
                   type="text"
                   name="deleteAccountEmail"
@@ -349,11 +359,13 @@ const ProfilePage = () => {
                   $error={!!errors.deleteAccount.email}
                 />
                 <p>
-                  To verify, type{" "}
                   <span>
-                    <i>"{CONFIRMATION_PHRASE}"</i>
-                  </span>{" "}
-                  below:
+                    <i>
+                      {t(locale.deleteAccount.label.confirmationPhrase, {
+                        phrase: CONFIRMATION_PHRASE,
+                      })}
+                    </i>
+                  </span>
                 </p>
                 <S.Input
                   type="text"
@@ -366,6 +378,11 @@ const ProfilePage = () => {
                 {errors.deleteAccount.phrase && (
                   <S.ErrorText>{errors.deleteAccount.phrase}</S.ErrorText>
                 )}
+                <p>
+                  {t(locale.deleteAccount.text.confirmPrompt, {
+                    phrase: CONFIRMATION_PHRASE,
+                  })}
+                </p>
               </>
             )}
             <S.ButtonWrapper>

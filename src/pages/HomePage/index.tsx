@@ -10,8 +10,10 @@ import { useAuth } from "../../contexts/auth";
 import { useError } from "../../contexts/error";
 import Calendar from "../../components/organisms/Calendar";
 import Header from "../../components/organisms/Header";
-import { capitalize } from "../../utils/string";
 import { ApiError } from "../../types/errorTypes";
+import { getCategoryLabel, getTxMethodLabel } from "../../utils/string";
+import ko from "../../i18n/locale/ko";
+import { t } from "../../i18n/interpolate";
 
 type TxType = "income" | "expense";
 type TxMethod = "cash" | "debit card" | "credit card" | "bank transfer";
@@ -23,7 +25,8 @@ interface Sum {
 
 interface Tx {
   id: number;
-  categoryName: string;
+  // categoryName: string;
+  categoryId: number;
   txType: TxType;
   txMethod: TxMethod;
   amount: number;
@@ -31,6 +34,8 @@ interface Tx {
 }
 
 const HomePage = () => {
+  const home = ko.home;
+
   const initialDate = getSelectedDate();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -87,12 +92,14 @@ const HomePage = () => {
     <S.Wrapper>
       <S.LeftWrapper>
         <Header
-          title={`차곡차곡, ${currentUser?.nickname}님의 ${
-            selectedDate.get("M") + 1
-          }월 가계부`}
-          description={` 🔵 수입 ‣ ${
-            sum?.totalIncome.toLocaleString() ?? 0
-          }원\n\n 🔴 지출 ‣ ${sum?.totalExpense.toLocaleString() ?? 0}원`}
+          title={t(home.title, {
+            nickname: currentUser?.nickname,
+            month: selectedDate.get("M") + 1,
+          })}
+          description={t(home.description, {
+            totalIncome: sum?.totalIncome.toLocaleString() ?? 0,
+            totalExpense: sum?.totalExpense.toLocaleString() ?? 0,
+          })}
         />
         <S.CalendarContainer>
           <Calendar selectedDate={selectedDate} onChange={handleChangeDate} />
@@ -100,21 +107,23 @@ const HomePage = () => {
       </S.LeftWrapper>
       <S.RightWrapper>
         <S.ButtonContainer>
-          <S.AddButton onClick={handleClickAdd}>내역 추가하기</S.AddButton>
+          <S.AddButton onClick={handleClickAdd}>
+            {t(home.addButton)}
+          </S.AddButton>
         </S.ButtonContainer>
         <S.ListItemContainer>
           {txs.length === 0 ? (
-            <S.Empty>
-              이 날짜에는 내역이 없어요. 새로운 내역을 추가해보세요!
-            </S.Empty>
+            <S.Empty>{t(home.emptyText)}</S.Empty>
           ) : (
             txs.map((tx) => (
               <S.ListItem
                 key={tx.id}
                 onClick={() => handleClickListItem(tx.id)}
               >
-                <S.Category>{capitalize(tx.categoryName)}</S.Category>
-                <S.PaymentMethod>{capitalize(tx.txMethod)}</S.PaymentMethod>
+                <S.Category>{getCategoryLabel(tx.categoryId)}</S.Category>
+                <S.PaymentMethod>
+                  {getTxMethodLabel(tx.txMethod)}
+                </S.PaymentMethod>
                 <S.Amount type={tx.txType}>
                   {tx.txType === "income" ? "+" : "-"} ₩
                   {tx.amount.toLocaleString()}
