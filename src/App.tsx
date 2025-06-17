@@ -104,7 +104,7 @@ const GlobalStyles = createGlobalStyle`
   body {
     background-color: ${({ theme }) => theme.background.light_blue};
     color: ${({ theme }) => theme.text.primary};
-    font-family: GoyangIlsan, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; */
+    font-family: GoyangIlsan, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
 
   button, input {
