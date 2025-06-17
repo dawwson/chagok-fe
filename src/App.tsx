@@ -97,27 +97,14 @@ const GlobalStyles = createGlobalStyle`
   }
 
   @font-face {
-    font-family: 'Godo';
-    font-style: normal;
-    font-weight: 400;
-    src: url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff2') format('woff2'), url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Godo';
-    font-style: normal;
-    font-weight: 700;
-    src: url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoB.woff2') format('woff2'), url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoB.woff') format('woff');
-  }
-
-  .godo * {
-  font-family: 'Godo', sans-serif;
+    font-family: GoyangIlsan;
+    src: url("src/assets/GoyangIlsan R.ttf") format("truetype");
   }
 
   body {
     background-color: ${({ theme }) => theme.background.light_blue};
     color: ${({ theme }) => theme.text.primary};
-    font-family: Godo, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: GoyangIlsan, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; */
   }
 
   button, input {
