@@ -30,23 +30,21 @@ export const ErrorProvider = ({ children }: Props) => {
       // ===== 400 =====
       // budget
       case "BUDGET_AMOUNT_OUT_OF_RANGE":
-        setErrorMessage(
-          "Please enter a category amount less than or equal to 2 billion."
-        );
+        setErrorMessage("카테고리 금액은 20억 이하로 입력해 주세요.");
         break;
       case "BUDGET_TOTAL_AMOUNT_OUT_OF_RANGE":
         setErrorMessage(
-          "The total budget exceeds the allowed limit of 10 billion. Please adjust your amounts accordingly."
+          "총 예산이 허용 한도인 100억을 초과했습니다. 금액을 조정해 주세요."
         );
         break;
       case "BUDGET_YEAR_OUT_OF_RANGE":
         setErrorMessage(
-          "You have reached the limit for budget creation in the selected year and month."
+          "선택한 년도와 월에는 더 이상 예산을 생성할 수 없습니다."
         );
         break;
       // tx
       case "TX_AMOUNT_OUT_OF_RANGE":
-        setErrorMessage("Please enter the amount.");
+        setErrorMessage("금액을 입력해 주세요.");
         break;
       // user
 
@@ -56,14 +54,10 @@ export const ErrorProvider = ({ children }: Props) => {
         navigateFn?.("/login", { replace: true });
         break;
       case "USER_EMAIL_DO_NOT_EXIST":
-        setErrorMessage(
-          "The email address you entered doesn't match any account."
-        );
+        setErrorMessage("입력하신 이메일 주소와\n일치하는 계정이 없습니다.");
         break;
       case "USER_PASSWORD_IS_WRONG":
-        setErrorMessage(
-          "The password you entered is incorrect.\nPlease try again."
-        );
+        setErrorMessage("비밀번호가 일치하지 않습니다.");
         break;
 
       // ===== 403 =====
@@ -76,13 +70,13 @@ export const ErrorProvider = ({ children }: Props) => {
 
       // ===== 404 =====
       case "CATEGORY_NOT_FOUND":
-        setErrorMessage("Invalid category.");
+        setErrorMessage("유효하지 않은 카테고리입니다.");
         break;
 
       // ===== 409 =====
       case "USER_EMAIL_IS_DUPLICATED":
         setErrorMessage(
-          "This email address cannot be used.\nPlease try a different one."
+          "이미 사용 중인 이메일입니다.\n다른 이메일을 입력해 주세요."
         );
         break;
       default:
@@ -105,7 +99,9 @@ export const ErrorProvider = ({ children }: Props) => {
             },
           ]}
         >
-          <p style={{ lineHeight: "1.5" }}>{errorMessage}</p>
+          <p style={{ lineHeight: "1.5", whiteSpace: "pre-wrap" }}>
+            {errorMessage}
+          </p>
         </Modal>
       )}
     </ErrorContext.Provider>
