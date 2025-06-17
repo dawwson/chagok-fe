@@ -13,9 +13,9 @@ const NotFoundPage = () => {
       <S.Title>404</S.Title>
       <S.Subtitle>Page Not Found</S.Subtitle>
       <S.Description>
-        Sorry, the page you are looking for doesn't exist.
+        죄송합니다. 해당 페이지를 찾을 수 없습니다. 주소를 다시 확인해 주세요.
       </S.Description>
-      <S.Button onClick={handleGoHome}>Go Home</S.Button>
+      <S.Button onClick={handleGoHome}>홈 화면으로 이동</S.Button>
     </S.Container>
   );
 };
