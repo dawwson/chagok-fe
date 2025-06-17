@@ -13,8 +13,6 @@ import { useAuth } from "../../contexts/auth";
 import Modal from "../../components/organisms/Modal";
 import { useError } from "../../contexts/error";
 import { ApiError } from "../../types/errorTypes";
-import { t } from "../../i18n/interpolate";
-import ko from "../../i18n/locale/ko";
 
 const CONFIRMATION_PHRASE = "delete my account";
 
@@ -24,8 +22,6 @@ interface Profile {
 }
 
 const ProfilePage = () => {
-  const locale = ko.profile;
-
   const { authenticate, deauthenticate } = useAuth();
   const { handleApiError } = useError();
   const [successModal, setSuccessModal] = useState({
@@ -87,10 +83,7 @@ const ProfilePage = () => {
       ...errors,
       profile: {
         ...errors.profile,
-        nickname:
-          value.length < 2
-            ? "Your nickname must be at least 2 characters long."
-            : "",
+        nickname: value.length < 2 ? "닉네임은 2글자 이상이어야 합니다." : "",
       },
     });
   };
@@ -102,7 +95,7 @@ const ProfilePage = () => {
       });
       setSuccessModal({
         isOpen: true,
-        message: "Your profile has been successfully updated.",
+        message: "프로필이 정상적으로 수정되었습니다.",
         onClose: () =>
           setSuccessModal({ isOpen: false, message: "", onClose: () => {} }),
       });
@@ -140,7 +133,7 @@ const ProfilePage = () => {
           ...errors.password,
           confirmNewPassword: isMatched
             ? ""
-            : t(locale.updatePassword.text.error),
+            : "새로운 비밀번호와 확인 비밀번호가 일치하지 않습니다.",
         },
       });
     }
@@ -198,7 +191,7 @@ const ProfilePage = () => {
       setSuccessModal({
         isOpen: true,
         message:
-          "Your account has been successfully deleted.\nThank you for using our service! 👋",
+          "계정이 정상적으로 삭제되었습니다.\n그동안 서비스를 이용해 주셔서 감사합니다!👋",
         onClose: () => deauthenticate(),
       });
     } catch (error) {
@@ -220,11 +213,11 @@ const ProfilePage = () => {
   return (
     <>
       <S.Wrapper>
-        <Header title={t(locale.title)} description={t(locale.description)} />
+        <Header title="계정 관리" description="내 정보를 수정할 수 있습니다." />
         <S.ScrollableWrapper>
           {/* ⭐️ Profile ⭐️ */}
           <S.Container>
-            <S.SubTitle>{t(locale.updateProfile.subTitle)}</S.SubTitle>
+            <S.SubTitle>기본 정보</S.SubTitle>
             <S.InputWrapper>
               <S.Input
                 type="text"
@@ -239,7 +232,7 @@ const ProfilePage = () => {
               <S.Input
                 type="text"
                 name="nickname"
-                placeholder={t(locale.updateProfile.placeholder.nickname)}
+                placeholder="닉네임"
                 value={profile.nickname}
                 onChange={handleChangeProfileInput}
                 $error={!!errors.profile.nickname}
@@ -248,7 +241,7 @@ const ProfilePage = () => {
             </S.InputWrapper>
             <S.ButtonWrapper>
               <BasicButton
-                label={t(locale.updateProfile.button.update)}
+                label="프로필 변경하기"
                 size="small"
                 type="confirm"
                 onClick={handleUpdateProfile}
@@ -258,16 +251,14 @@ const ProfilePage = () => {
           </S.Container>
           {/* ⭐️ Password ⭐️ */}
           <S.Container>
-            <S.SubTitle>{t(locale.updatePassword.subTitle)}</S.SubTitle>
+            <S.SubTitle>비밀번호</S.SubTitle>
             {!hidden.updatePassword && (
               <>
                 <S.InputWrapper>
                   <S.Input
                     type="password"
                     name="oldPassword"
-                    placeholder={t(
-                      locale.updatePassword.placeholder.oldPassword
-                    )}
+                    placeholder="현재 비밀번호"
                     value={password.oldPassword}
                     onChange={handleChangePasswordInput}
                     $error={!!errors.password.oldPassword}
@@ -279,9 +270,7 @@ const ProfilePage = () => {
                   <S.Input
                     type="password"
                     name="newPassword"
-                    placeholder={t(
-                      locale.updatePassword.placeholder.newPassword
-                    )}
+                    placeholder="새로운 비밀번호"
                     value={password.newPassword}
                     onChange={handleChangePasswordInput}
                     $error={!!errors.password.newPassword}
@@ -293,9 +282,7 @@ const ProfilePage = () => {
                   <S.Input
                     type="password"
                     name="confirmNewPassword"
-                    placeholder={t(
-                      locale.updatePassword.placeholder.confirmPassword
-                    )}
+                    placeholder="새로운 비밀번호 확인"
                     value={password.confirmNewPassword}
                     onChange={handleChangePasswordInput}
                     $error={!!errors.password.confirmNewPassword}
@@ -309,11 +296,7 @@ const ProfilePage = () => {
             )}
             <S.ButtonWrapper>
               <BasicButton
-                label={
-                  hidden.updatePassword
-                    ? t(locale.updatePassword.button.show)
-                    : t(locale.updatePassword.button.hide)
-                }
+                label={hidden.updatePassword ? "펼치기" : "접기"}
                 size="small"
                 type={hidden.updatePassword ? "confirm" : "default"}
                 onClick={() =>
@@ -325,7 +308,7 @@ const ProfilePage = () => {
               />
               {!hidden.updatePassword && (
                 <BasicButton
-                  label={t(locale.updatePassword.button.update)}
+                  label="비밀번호 변경하기"
                   size="small"
                   type="confirm"
                   disabled={
@@ -341,53 +324,47 @@ const ProfilePage = () => {
           </S.Container>
           {/* ⭐️ Delete Account ⭐️ */}
           <S.Container>
-            <S.SubTitle className="delete-account">
-              {t(locale.deleteAccount.subTitle)}
-            </S.SubTitle>
+            <S.SubTitle className="delete-account">회원 탈퇴</S.SubTitle>
             <p>
-              <span>{t(locale.deleteAccount.text.warning)}</span>
+              <span>
+                ⚠️ 경고: 모든 데이터가 영구적으로 삭제됩니다. 계정을 삭제하면
+                복구할 수 없습니다. 신중하게 결정해 주세요.
+              </span>
             </p>
             {!hidden.deleteAccount && (
               <>
-                <p>{t(locale.deleteAccount.label.email)}</p>
+                <p>이메일을 입력해주세요 : </p>
                 <S.Input
                   type="text"
                   name="deleteAccountEmail"
                   value={deleteAccount.email}
-                  placeholder="Email"
+                  placeholder="이메일"
                   onChange={handleDeleteAccountInput}
                   $error={!!errors.deleteAccount.email}
                 />
                 <p>
                   <span>
-                    <i>
-                      {t(locale.deleteAccount.label.confirmationPhrase, {
-                        phrase: CONFIRMATION_PHRASE,
-                      })}
-                    </i>
+                    확인을 위해, 아래에
+                    <i>"{CONFIRMATION_PHRASE}"</i>를 입력해 주세요 :
                   </span>
                 </p>
                 <S.Input
                   type="text"
                   name="confirmationPhrase"
                   value={deleteAccount.phrase}
-                  placeholder="Confirmation phrase"
+                  placeholder="확인문구"
                   onChange={handleDeleteAccountInput}
                   $error={!!errors.deleteAccount.email}
                 />
                 {errors.deleteAccount.phrase && (
                   <S.ErrorText>{errors.deleteAccount.phrase}</S.ErrorText>
                 )}
-                <p>
-                  {t(locale.deleteAccount.text.confirmPrompt, {
-                    phrase: CONFIRMATION_PHRASE,
-                  })}
-                </p>
+                <p>정말로 진행하시겠습니까?</p>
               </>
             )}
             <S.ButtonWrapper>
               <BasicButton
-                label={hidden.deleteAccount ? "Show" : "Hide"}
+                label={hidden.deleteAccount ? "펼치기" : "접기"}
                 size="small"
                 type={hidden.deleteAccount ? "danger" : "default"}
                 onClick={() =>
@@ -396,14 +373,14 @@ const ProfilePage = () => {
               />
               {!hidden.deleteAccount && (
                 <BasicButton
-                  label="Delete your account"
+                  label="탈퇴하기"
                   size="small"
                   type="danger"
                   onClick={() =>
                     setWarningModal({
                       isOpen: true,
                       message:
-                        "Your account will be retained for 7 days before permanent deletion. If you wish to recover it, please act within this period.",
+                        "계정은 영구 삭제 전까지 7일 동안 보관됩니다.\n복구를 원하신다면 이 기간 내에\n관리자에게 이메일로 문의해주세요.",
                     })
                   }
                   disabled={
@@ -421,13 +398,15 @@ const ProfilePage = () => {
           type="success"
           buttons={[
             {
-              label: "OK",
+              label: "확인",
               location: "center",
               onClick: successModal.onClose,
             },
           ]}
         >
-          <p style={{ lineHeight: "1.5" }}>{successModal.message}</p>
+          <p style={{ lineHeight: "1.5", whiteSpace: "pre-wrap" }}>
+            {successModal.message}
+          </p>
         </Modal>
       )}
       {warningModal.isOpen && (
@@ -435,18 +414,20 @@ const ProfilePage = () => {
           type="warn"
           buttons={[
             {
-              label: "Cancel",
+              label: "닫기",
               location: "left",
               onClick: () => setWarningModal({ isOpen: false, message: "" }),
             },
             {
-              label: "Proceed",
+              label: "탈퇴 진행하기",
               location: "right",
               onClick: handleDeleteAccount,
             },
           ]}
         >
-          <p style={{ lineHeight: "1.5" }}>{warningModal.message}</p>
+          <p style={{ lineHeight: "1.5", whiteSpace: "pre-wrap" }}>
+            {warningModal.message}
+          </p>
         </Modal>
       )}
     </>
