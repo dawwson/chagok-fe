@@ -47,6 +47,9 @@ export const ErrorProvider = ({ children }: Props) => {
         setErrorMessage("금액을 입력해 주세요.");
         break;
       // user
+      case "USER_INVALID_EMAIL":
+        setErrorMessage("이메일 형식이 올바르지 않습니다.");
+        break;
 
       // ===== 401 =====
       case "AUTH_INVALID_TOKEN":
@@ -93,7 +96,7 @@ export const ErrorProvider = ({ children }: Props) => {
           type="error"
           buttons={[
             {
-              label: "Close",
+              label: "닫기",
               location: "center",
               onClick: () => setErrorMessage(null),
             },
