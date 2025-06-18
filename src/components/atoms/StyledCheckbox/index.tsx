@@ -1,3 +1,4 @@
+import { useTheme } from "styled-components";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
@@ -8,6 +9,8 @@ interface Props {
 }
 
 const StyledCheckbox = ({ label, isChecked, onChange }: Props) => {
+  const theme = useTheme();
+
   return (
     <FormControlLabel
       control={
@@ -17,7 +20,7 @@ const StyledCheckbox = ({ label, isChecked, onChange }: Props) => {
           onChange={onChange}
           sx={{
             "&.Mui-checked": {
-              color: "#0D99FF", // 체크된 색상
+              color: theme.button.primary, // 체크된 색상
             },
             marginLeft: "16px",
           }}
@@ -25,7 +28,7 @@ const StyledCheckbox = ({ label, isChecked, onChange }: Props) => {
       }
       label={label}
       sx={{
-        color: "#1E1E1E",
+        color: isChecked ? theme.text.primary : theme.text.secondary,
         fontSize: "24px",
       }}
     />
