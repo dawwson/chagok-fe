@@ -8,29 +8,27 @@ const EXTRA_DARK_GRAY = "#757575";
 const RED = "#F24822";
 
 export const lightTheme = {
-  colors: {
-    background: {
-      white: WHITE,
-      light_blue: LIGHT_BLUE,
-    },
-    button: {
-      primary: DARK_BLUE,
-      secondary: LIGHT_GRAY,
-      tertiary: WHITE,
-      danger: RED,
-    },
-    text: {
-      primary: BLACK,
-      secondary: EXTRA_DARK_GRAY,
-      tertiary: DARK_GRAY,
-      accent: DARK_BLUE,
-      danger: RED,
-    },
-    buttonText: {
-      primary: WHITE,
-      secondary: BLACK,
-      danger: WHITE,
-    },
+  background: {
+    white: WHITE,
+    light_blue: LIGHT_BLUE,
+  },
+  button: {
+    primary: DARK_BLUE,
+    secondary: LIGHT_GRAY,
+    tertiary: WHITE,
+    danger: RED,
+  },
+  text: {
+    primary: BLACK,
+    secondary: EXTRA_DARK_GRAY,
+    tertiary: DARK_GRAY,
+    accent: DARK_BLUE,
+    danger: RED,
+  },
+  buttonText: {
+    primary: WHITE,
+    secondary: BLACK,
+    danger: WHITE,
   },
 };
 
