@@ -3,171 +3,114 @@
     "id": 1,
     "name": "salary",
     "type": "income",
-    "labels": {
-      "ko": "월급",
-      "en": "Salary"
-    }
+    "label": "월급"
   },
   {
     "id": 2,
     "name": "business",
     "type": "income",
-    "labels": {
-      "ko": "사업소득",
-      "en": "Business Income"
-    }
+    "label": "사업소득"
   },
   {
     "id": 3,
     "name": "investment",
     "type": "income",
-    "labels": {
-      "ko": "투자소득",
-      "en": "Investment Income"
-    }
+    "label": "투자소득"
   },
   {
     "id": 4,
     "name": "other income",
     "type": "income",
-    "labels": {
-      "ko": "기타소득",
-      "en": "Other Income"
-    }
+    "label": "기타소득"
   },
   {
     "id": 5,
     "name": "food",
     "type": "expense",
-    "labels": {
-      "ko": "식비",
-      "en": "Food"
-    }
+    "label": "식비"
   },
   {
     "id": 6,
     "name": "housing",
     "type": "expense",
-    "labels": {
-      "ko": "주거",
-      "en": "Housing"
-    }
+    "label": "주거"
   },
   {
     "id": 7,
     "name": "transportation",
     "type": "expense",
-    "labels": {
-      "ko": "교통",
-      "en": "Transportation"
-    }
+    "label": "교통"
   },
   {
     "id": 8,
     "name": "healthcare",
     "type": "expense",
-    "labels": {
-      "ko": "의료",
-      "en": "Healthcare"
-    }
+    "label": "의료"
   },
   {
     "id": 9,
     "name": "communication",
     "type": "expense",
-    "labels": {
-      "ko": "통신",
-      "en": "Communication"
-    }
+    "label": "통신"
   },
   {
     "id": 10,
     "name": "education",
     "type": "expense",
-    "labels": {
-      "ko": "교육",
-      "en": "Education"
-    }
+    "label": "교육"
   },
   {
     "id": 11,
     "name": "entertainment",
     "type": "expense",
-    "labels": {
-      "ko": "취미/여가",
-      "en": "Entertainment"
-    }
+    "label": "취미/여가"
   },
   {
     "id": 12,
     "name": "shopping",
     "type": "expense",
-    "labels": {
-      "ko": "쇼핑",
-      "en": "Shopping"
-    }
+    "label": "쇼핑"
   },
   {
     "id": 13,
     "name": "household",
     "type": "expense",
-    "labels": {
-      "ko": "생활용품",
-      "en": "Household"
-    }
+    "label": "생활용품"
   },
   {
     "id": 14,
     "name": "insurance",
     "type": "expense",
-    "labels": {
-      "ko": "보험",
-      "en": "Insurance"
-    }
+    "label": "보험"
   },
   {
     "id": 15,
     "name": "tax",
     "type": "expense",
-    "labels": {
-      "ko": "세금",
-      "en": "Tax"
-    }
+    "label": "세금"
   },
   {
     "id": 16,
     "name": "pet",
     "type": "expense",
-    "labels": {
-      "ko": "반려동물",
-      "en": "Pet"
-    }
+    "label": "반려동물"
   },
   {
     "id": 17,
     "name": "subscription",
     "type": "expense",
-    "labels": {
-      "ko": "구독",
-      "en": "Subscription"
-    }
+    "label": "구독"
   },
   {
     "id": 18,
     "name": "donation",
     "type": "expense",
-    "labels": {
-      "ko": "기부",
-      "en": "Donation"
-    }
+    "label": "기부"
   },
   {
     "id": 19,
     "name": "other expense",
     "type": "expense",
-    "labels": {
-      "ko": "기타",
-      "en": "Other Expense"
-    }
+    "label": "기타"
   }
 ]
