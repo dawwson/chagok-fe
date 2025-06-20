@@ -218,7 +218,7 @@ const ManageTransactionPage = () => {
           <S.TransactionContainer>
             <S.Date>{renderDate()}</S.Date>
             <S.Type>{getTxTypeLabel(tx.txType)}</S.Type>
-            <S.Amount>₩{tx.amount.toLocaleString()}</S.Amount>
+            <S.Amount>{tx.amount.toLocaleString() + "원"}</S.Amount>
             <S.Category>{getCategoryLabel(tx.categoryId)}</S.Category>
             <S.Description>
               {`${getTxMethodLabel(tx.txMethod)}${

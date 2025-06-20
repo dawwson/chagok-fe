@@ -23,7 +23,6 @@ interface Sum {
 
 interface Tx {
   id: number;
-  // categoryName: string;
   categoryId: number;
   txType: TxType;
   txMethod: TxMethod;

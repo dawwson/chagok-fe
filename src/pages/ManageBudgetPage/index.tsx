@@ -16,7 +16,7 @@ import Header from "../../components/organisms/Header";
 import Modal from "../../components/organisms/Modal";
 import YearMonthPicker from "../../components/organisms/YearMonthPicker";
 import { ApiError } from "../../types/errorTypes";
-import { capitalize } from "../../utils/string";
+import { getCategoryLabel } from "../../utils/string";
 
 const MAX_AMOUNT = 1000000000; // 10억
 
@@ -39,7 +39,7 @@ const ManageBudgetPage = () => {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [targetAmount, setTargetAmount] = useState(0); // 예산 추천시 입력하는 값
-  const [spents, setSpents] = useState<Map<string, number>>(new Map());
+  const [spents, setSpents] = useState<Map<number, number>>(new Map());
   const [budget, setBudget] = useState<Budget>({
     id: null,
     year: dayjs().year(),
@@ -84,10 +84,10 @@ const ManageBudgetPage = () => {
     try {
       if (budget.id) {
         await updateBudget(budget.id, budget.budgets);
-        setSuccessMessage("The budget has been updated.");
+        setSuccessMessage("예산이 수정되었습니다.");
       } else {
         await createBudget(budget.year, budget.month, budget.budgets);
-        setSuccessMessage("The budget has been created.");
+        setSuccessMessage("예산이 등록되었습니다.");
       }
       setIsSuccessModalOpen(true);
 
@@ -110,11 +110,11 @@ const ManageBudgetPage = () => {
 
       if (recommended.budgets.length === 0) {
         setSuccessMessage(
-          "No recent budget data found.\nPlease set up your budget to start tracking your expenses!"
+          "예산 추천을 위해서는\n최근 6개월 간의 예산 설정 이력이 필요해요.\n먼저 예산을 설정하면 다음부터 맞춤 추천을\n받아보실 수 있어요!"
         );
       } else {
         setSuccessMessage(
-          "Your budget recommendations have been generated!\nCheck them out and adjust as needed."
+          "추천 예산이 생성되었습니다!\n내용을 확인하고 필요에 따라 조정해 보세요.\n변경 내용을 저장해야 적용됩니다."
         );
         setBudget({ id: budget.id, ...recommended });
       }
@@ -176,21 +176,25 @@ const ManageBudgetPage = () => {
     if (totalSavings >= 0) {
       return (
         <>
-          You have{" "}
+          예산이&nbsp;
           <S.SavingsSpan $isNegative={false}>
-            {totalSavings.toLocaleString()}₩{" "}
+            {totalSavings.toLocaleString()}원
           </S.SavingsSpan>
-          remaining from your total budget.
+          &nbsp;남았습니다.
+          <br />
+          남은 금액도 알차게 활용해 보세요!
         </>
       );
     } else {
       return (
         <>
-          You have exceeded your budget by{" "}
+          예산보다&nbsp;
           <S.SavingsSpan $isNegative={true}>
-            {Math.abs(totalSavings).toLocaleString()}₩
+            {Math.abs(totalSavings).toLocaleString()}
           </S.SavingsSpan>
-          .
+          원이 더 사용되었어요!
+          <br />
+          필요하다면 조정해 보세요.
         </>
       );
     }
@@ -213,7 +217,7 @@ const ManageBudgetPage = () => {
         const spentMap = new Map();
         txs.forEach((tx) => {
           if (tx.txType === "expense") {
-            spentMap.set(tx.categoryName, tx.amount);
+            spentMap.set(tx.categoryId, tx.amount);
           }
         });
         setSpents(spentMap);
@@ -232,8 +236,8 @@ const ManageBudgetPage = () => {
       <S.Wrapper>
         <S.LeftWrapper>
           <Header
-            title={"Manage a Monthly Budget"}
-            description="Set a monthly budget for each category."
+            title={"예산 관리하기"}
+            description="카테고리별로 월 예산을 설정해 보세요."
           />
           <S.ResultContainer>
             <YearMonthPicker
@@ -241,20 +245,21 @@ const ManageBudgetPage = () => {
               month={budget.month}
               onChange={handleChangeDate}
             />
-            <S.ResultSubtitle>Total</S.ResultSubtitle>
+            <S.ResultSubtitle>총 예산</S.ResultSubtitle>
             <S.ResultAmount>
-              {calculateTotalAmount().toLocaleString()}₩
+              {calculateTotalAmount().toLocaleString()}원
             </S.ResultAmount>
             <S.ResultDescription>{renderTotalSavings()}</S.ResultDescription>
             <S.ButtonGroup>
               <BasicButton
-                label="Cancel"
+                label="취소하기"
                 size="large"
                 type="cancel"
+                // TODO: 이전 값으로 되돌리기로 기능 변경
                 onClick={() => navigate("/", { replace: true })}
               />
               <BasicButton
-                label="Save"
+                label="저장하기"
                 size="large"
                 type="confirm"
                 onClick={handleSave}
@@ -265,31 +270,33 @@ const ManageBudgetPage = () => {
         <S.RightWrapper>
           <S.ButtonContainer>
             <S.RecommendButton onClick={() => setIsRecommendModalOpen(true)}>
-              Recommend Budget
+              예산 추천
             </S.RecommendButton>
           </S.ButtonContainer>
           <S.ListItemContainer>
             {budget.budgets.map((b) => (
               <S.ListItem key={b.categoryId}>
-                <S.ListItemTitle>{capitalize(b.categoryName)}</S.ListItemTitle>
+                <S.ListItemTitle>
+                  {getCategoryLabel(b.categoryId)}
+                </S.ListItemTitle>
                 <S.ListItemSubtitle>
                   <p>
-                    Potential savings :{" "}
+                    남은 예산 :&nbsp;
                     <S.SavingsSpan
                       $isNegative={
-                        b.amount - (spents.get(b.categoryName) ?? 0) < 0
+                        b.amount - (spents.get(b.categoryId) ?? 0) < 0
                       }
                     >
                       {(
-                        b.amount - (spents.get(b.categoryName) ?? 0)
+                        b.amount - (spents.get(b.categoryId) ?? 0)
                       ).toLocaleString()}
-                      ₩
+                      원
                     </S.SavingsSpan>
                   </p>
                   <p>
-                    Spent :{" "}
+                    사용 금액 :&nbsp;
                     <span>
-                      {spents.get(b.categoryName)?.toLocaleString() ?? 0}₩
+                      {spents.get(b.categoryId)?.toLocaleString() ?? 0}원
                     </span>
                   </p>
                 </S.ListItemSubtitle>
@@ -308,26 +315,26 @@ const ManageBudgetPage = () => {
           type="info"
           buttons={[
             {
-              label: "Cancel",
+              label: "닫기",
               location: "left",
               onClick: () => setIsRecommendModalOpen(false),
             },
             {
-              label: "Submit",
+              label: "제출",
               location: "right",
               onClick: handleRecommend,
             },
           ]}
         >
           <p style={{ lineHeight: "1.5", marginBottom: "20px" }}>
-            Based on your past spending,
+            지난 6개월간의 예산을 기반으로
             <br />
-            we recommend setting your budget.
+            카테고리별 예산을 추천해드릴게요.
           </p>
           <S.ModalInput
             name="targetAmount"
             value={targetAmount === 0 ? "" : targetAmount.toLocaleString()}
-            placeholder="Enter your montly budget"
+            placeholder="월 예산을 입력하세요."
             onChange={handleChangeModalInput}
           />
         </Modal>
@@ -337,7 +344,7 @@ const ManageBudgetPage = () => {
           type="success"
           buttons={[
             {
-              label: "Confirm",
+              label: "확인",
               location: "center",
               onClick: () => setIsSuccessModalOpen(false),
             },
