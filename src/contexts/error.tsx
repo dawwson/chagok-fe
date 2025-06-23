@@ -96,7 +96,7 @@ export const ErrorProvider = ({ children }: Props) => {
           type="error"
           buttons={[
             {
-              label: "닫기",
+              label: "확인",
               location: "center",
               onClick: () => setErrorMessage(null),
             },
