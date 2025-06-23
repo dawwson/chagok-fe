@@ -419,7 +419,7 @@ const ProfilePage = () => {
               onClick: () => setWarningModal({ isOpen: false, message: "" }),
             },
             {
-              label: "탈퇴 진행하기",
+              label: "탈퇴하기",
               location: "right",
               onClick: handleDeleteAccount,
             },
