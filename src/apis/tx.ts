@@ -36,7 +36,7 @@ interface GetTxSumResponse {
 
 interface GetTxsResponse {
   id: number;
-  categoryName: string;
+  categoryId: number;
   txType: TxType;
   txMethod: TxMethod;
   amount: number;
