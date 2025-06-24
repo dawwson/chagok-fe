@@ -14,9 +14,9 @@ const ForbiddenPage = () => {
       <S.Title>403</S.Title>
       <S.Subtitle>Forbidden</S.Subtitle>
       <S.Description>
-        Sorry, you don’t have permission to access this resource.
+        접근 권한이 없습니다. 관리자에게 문의해 주세요.
       </S.Description>
-      <S.Button onClick={handleGoHome}>Go Home</S.Button>
+      <S.Button onClick={handleGoHome}>홈 화면으로 이동</S.Button>
     </S.Container>
   );
 };

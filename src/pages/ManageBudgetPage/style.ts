@@ -42,15 +42,12 @@ export const ResultAmount = styled.h1`
   margin-bottom: 50px;
 `;
 
-export const ResultDescription = styled.h1`
+export const ResultDescription = styled.div`
   color: ${({ theme }) => theme.text.secondary};
   font-size: 18px;
   margin-bottom: 100px;
   max-width: 100%;
-
-  & span {
-    font-weight: bold;
-  }
+  line-height: 1.5;
 `;
 
 export const ButtonGroup = styled.div`

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import * as S from "./style";
-import { getCategories } from "../../apis/category";
 import { createTx, deleteTx, getTxDetail, updateTx } from "../../apis/tx";
 
 import { useError } from "../../contexts/error";
@@ -15,8 +14,13 @@ import LoadingScreen from "../../components/organisms/LoadingScreen";
 import Modal from "../../components/organisms/Modal";
 
 import { ApiError } from "../../types/errorTypes";
-import { capitalize } from "../../utils/string";
 import { localize } from "../../utils/date";
+import {
+  getCategories,
+  getCategoryLabel,
+  getTxMethodLabel,
+  getTxTypeLabel,
+} from "../../utils/string";
 
 const DEFAULT_INCOME_CATEGORY_ID = 1;
 const DEFAULT_EXPENSE_CATEGORY_ID = 5;
@@ -25,12 +29,6 @@ const MAX_DESCRIPTION_LENGTH = 100;
 
 type TxType = "income" | "expense";
 type TxMethod = "cash" | "debit card" | "credit card" | "bank transfer";
-
-interface Category {
-  id: number;
-  name: string;
-  type: TxType;
-}
 
 interface Tx {
   id?: number;
@@ -58,7 +56,6 @@ const ManageTransactionPage = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [tx, setTx] = useState<Tx>({
     id: txId,
     txType: "income",
@@ -126,6 +123,7 @@ const ManageTransactionPage = () => {
 
   const handleCancel = () => {
     navigate("/");
+    // TODO: 초기값 또는 서버에서 가져온 값으로 되돌리기
   };
 
   const handleAddOrUpdate = async () => {
@@ -173,12 +171,12 @@ const ManageTransactionPage = () => {
   };
 
   const renderCategoryChips = () => {
-    return categories.map((category) => {
+    return getCategories().map((category) => {
       if (category.type === tx.txType) {
         return (
           <ChipButton
             key={category.id}
-            label={capitalize(category.name)}
+            label={category.label}
             selected={category.id === tx.categoryId}
             onClick={() => handleSelectCategory(category.id)}
           />
@@ -190,9 +188,6 @@ const ManageTransactionPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const categories = await getCategories();
-        setCategories(categories);
-
         if (isEditPage) {
           const txDetail = await getTxDetail(txId);
           setTx(txDetail);
@@ -217,32 +212,28 @@ const ManageTransactionPage = () => {
       <S.Wrapper>
         <S.LeftWrapper>
           <Header
-            title={isEditPage ? "Edit a Transaction" : "Add a Transaction"}
-            description="Enter your income or expenses."
+            title={isEditPage ? "내역 수정하기" : "내역 작성하기"}
+            description="수입/지출을 작성해보세요."
           />
           <S.TransactionContainer>
             <S.Date>{renderDate()}</S.Date>
-            <S.Type>{capitalize(tx.txType)}</S.Type>
-            <S.Amount>₩{tx.amount.toLocaleString()}</S.Amount>
-            <S.Category>
-              {capitalize(
-                categories.find(({ id }) => id === tx.categoryId)?.name ?? ""
-              )}
-            </S.Category>
+            <S.Type>{getTxTypeLabel(tx.txType)}</S.Type>
+            <S.Amount>{tx.amount.toLocaleString() + "원"}</S.Amount>
+            <S.Category>{getCategoryLabel(tx.categoryId)}</S.Category>
             <S.Description>
-              {`${capitalize(tx.txMethod)}${
+              {`${getTxMethodLabel(tx.txMethod)}${
                 tx.description ? ` - ${tx.description}` : ""
               }`}
             </S.Description>
             <S.ButtonGroup>
               <BasicButton
-                label="Cancel"
+                label="취소"
                 size="large"
                 type="cancel"
                 onClick={handleCancel}
               />
               <BasicButton
-                label={isAddPage ? "Add" : "Update"}
+                label={isAddPage ? "저장하기" : "수정하기"}
                 size="large"
                 type="confirm"
                 onClick={handleAddOrUpdate}
@@ -252,51 +243,51 @@ const ManageTransactionPage = () => {
         </S.LeftWrapper>
         <S.RightWrapper>
           <S.SelectorWrapper>
-            <S.SubTitle>Type</S.SubTitle>
+            <S.SubTitle>유형</S.SubTitle>
             <S.ChipGroup>
               <ChipButton
-                label="Income"
+                label="수입"
                 selected={tx.txType === "income"}
                 onClick={() => handleSelectTxType("income")}
               />
               <ChipButton
-                label="Expense"
+                label="지출"
                 selected={tx.txType === "expense"}
                 onClick={() => handleSelectTxType("expense")}
               />
             </S.ChipGroup>
           </S.SelectorWrapper>
           <S.SelectorWrapper>
-            <S.SubTitle>Transaction Method</S.SubTitle>
+            <S.SubTitle>거래 방법</S.SubTitle>
             <S.ChipGroup>
               <ChipButton
-                label="Cash"
+                label="현금"
                 selected={tx.txMethod === "cash"}
                 onClick={() => handleSelectTxMethod("cash")}
               />
               <ChipButton
-                label="Debit Card"
+                label="체크카드"
                 selected={tx.txMethod === "debit card"}
                 onClick={() => handleSelectTxMethod("debit card")}
               />
               <ChipButton
-                label="Credit Card"
+                label="신용카드"
                 selected={tx.txMethod === "credit card"}
                 onClick={() => handleSelectTxMethod("credit card")}
               />
               <ChipButton
-                label="Bank Transfer"
+                label="계좌이체"
                 selected={tx.txMethod === "bank transfer"}
                 onClick={() => handleSelectTxMethod("bank transfer")}
               />
             </S.ChipGroup>
           </S.SelectorWrapper>
           <S.SelectorWrapper>
-            <S.SubTitle>Category</S.SubTitle>
+            <S.SubTitle>카테고리</S.SubTitle>
             <S.ChipGroup>{renderCategoryChips()}</S.ChipGroup>
           </S.SelectorWrapper>
           <S.SelectorWrapper>
-            <S.SubTitle>Amount</S.SubTitle>
+            <S.SubTitle>금액</S.SubTitle>
             <S.Input
               name="amount"
               value={tx.amount.toLocaleString()}
@@ -304,17 +295,17 @@ const ManageTransactionPage = () => {
             />
           </S.SelectorWrapper>
           <S.SelectorWrapper>
-            <S.SubTitle>Description</S.SubTitle>
+            <S.SubTitle>내역 설명</S.SubTitle>
             <S.Input
               name="description"
               value={tx.description}
-              placeholder="This field is optional."
+              placeholder="간단한 메모를 남겨보세요 (선택사항)"
               onChange={handleChangeDescription}
             />
           </S.SelectorWrapper>
           <S.SelectorWrapper>
             <StyledCheckbox
-              label="Exclude from transaction sum"
+              label="합계 계산에 포함하지 않기"
               isChecked={tx.isExcluded}
               onChange={handleChangeCheckbox}
             />
@@ -322,7 +313,7 @@ const ManageTransactionPage = () => {
           {isEditPage && (
             <S.DeleteButtonWrapper>
               <BasicButton
-                label="Delete"
+                label="삭제하기"
                 type="danger"
                 size="large"
                 onClick={handleClickDelete}
@@ -336,20 +327,21 @@ const ManageTransactionPage = () => {
           type="warn"
           buttons={[
             {
-              label: "Cancel",
+              label: "취소",
               location: "left",
               onClick: () => setIsOpen(false),
             },
             {
-              label: "Delete",
+              label: "삭제",
               location: "right",
               onClick: handleClickModalRightBtn,
             },
           ]}
         >
           <p style={{ lineHeight: "1.5" }}>
-            Are you sure you want to delete this?{<br />}This action cannot be
-            undone.
+            삭제하시겠어요?
+            <br />
+            삭제 후 복구할 수 없습니다.
           </p>
         </Modal>
       )}

@@ -1,0 +1,18 @@
+[
+  {
+    "name": "cash",
+    "label": "현금"
+  },
+  {
+    "name": "debit card",
+    "label": "체크카드"
+  },
+  {
+    "name": "credit card",
+    "label": "신용카드"
+  },
+  {
+    "name": "bank transfer",
+    "label": "계좌이체"
+  }
+]

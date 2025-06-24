@@ -31,3 +31,5 @@ export const lightTheme = {
     danger: WHITE,
   },
 };
+
+export type CustomTheme = typeof lightTheme;

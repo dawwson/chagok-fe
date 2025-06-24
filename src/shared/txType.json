@@ -1,0 +1,10 @@
+[
+  {
+    "name": "income",
+    "label": "수입"
+  },
+  {
+    "name": "expense",
+    "label": "지출"
+  }
+]

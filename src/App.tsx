@@ -1,8 +1,12 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { createGlobalStyle, ThemeProvider } from "styled-components";
+import { createTheme, ThemeProvider as MuiThemeProvider } from "@mui/material";
+import {
+  createGlobalStyle,
+  ThemeProvider as StyledThemeProvider,
+} from "styled-components";
 import reset from "styled-reset";
 
-import { lightTheme } from "./configs/theme";
+import { lightTheme as styledTheme } from "./styles/theme";
 import { AuthProvider } from "./contexts/auth";
 import { ErrorProvider } from "./contexts/error";
 
@@ -23,12 +27,20 @@ import ForbiddenPage from "./pages/ForbiddenPage";
 function App() {
   return (
     <AuthProvider>
-      <ThemeProvider theme={lightTheme}>
-        <GlobalStyles />
-        <ErrorProvider>
-          <RouterProvider router={router} />
-        </ErrorProvider>
-      </ThemeProvider>
+      <MuiThemeProvider
+        theme={createTheme({
+          typography: {
+            fontFamily: "GoyangIlsan",
+          },
+        })}
+      >
+        <StyledThemeProvider theme={styledTheme}>
+          <GlobalStyles />
+          <ErrorProvider>
+            <RouterProvider router={router} />
+          </ErrorProvider>
+        </StyledThemeProvider>
+      </MuiThemeProvider>
     </AuthProvider>
   );
 }
@@ -96,10 +108,19 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  @font-face {
+    font-family: GoyangIlsan;
+    src: url("src/assets/GoyangIlsan R.ttf") format("truetype");
+  }
+
   body {
     background-color: ${({ theme }) => theme.background.light_blue};
     color: ${({ theme }) => theme.text.primary};
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: GoyangIlsan, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+
+  button, input {
+    font-family: inherit;
   }
 `;
 

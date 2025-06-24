@@ -55,10 +55,10 @@ export const Content = styled.div`
 
 export const Footer = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   padding-top: 10px;
 
   & > button {
-    margin: 0 30px;
+    margin: 0 20px;
   }
 `;

@@ -1,0 +1,116 @@
+[
+  {
+    "id": 1,
+    "name": "salary",
+    "type": "income",
+    "label": "월급"
+  },
+  {
+    "id": 2,
+    "name": "business",
+    "type": "income",
+    "label": "사업소득"
+  },
+  {
+    "id": 3,
+    "name": "investment",
+    "type": "income",
+    "label": "투자소득"
+  },
+  {
+    "id": 4,
+    "name": "other income",
+    "type": "income",
+    "label": "기타소득"
+  },
+  {
+    "id": 5,
+    "name": "food",
+    "type": "expense",
+    "label": "식비"
+  },
+  {
+    "id": 6,
+    "name": "housing",
+    "type": "expense",
+    "label": "주거"
+  },
+  {
+    "id": 7,
+    "name": "transportation",
+    "type": "expense",
+    "label": "교통"
+  },
+  {
+    "id": 8,
+    "name": "healthcare",
+    "type": "expense",
+    "label": "의료"
+  },
+  {
+    "id": 9,
+    "name": "communication",
+    "type": "expense",
+    "label": "통신"
+  },
+  {
+    "id": 10,
+    "name": "education",
+    "type": "expense",
+    "label": "교육"
+  },
+  {
+    "id": 11,
+    "name": "entertainment",
+    "type": "expense",
+    "label": "취미/여가"
+  },
+  {
+    "id": 12,
+    "name": "shopping",
+    "type": "expense",
+    "label": "쇼핑"
+  },
+  {
+    "id": 13,
+    "name": "household",
+    "type": "expense",
+    "label": "생활용품"
+  },
+  {
+    "id": 14,
+    "name": "insurance",
+    "type": "expense",
+    "label": "보험"
+  },
+  {
+    "id": 15,
+    "name": "tax",
+    "type": "expense",
+    "label": "세금"
+  },
+  {
+    "id": 16,
+    "name": "pet",
+    "type": "expense",
+    "label": "반려동물"
+  },
+  {
+    "id": 17,
+    "name": "subscription",
+    "type": "expense",
+    "label": "구독"
+  },
+  {
+    "id": 18,
+    "name": "donation",
+    "type": "expense",
+    "label": "기부"
+  },
+  {
+    "id": 19,
+    "name": "other expense",
+    "type": "expense",
+    "label": "기타"
+  }
+]

@@ -4,8 +4,8 @@ import dayjs from "dayjs";
 import * as S from "./style";
 import {
   formatDate,
-  getCategoryChangeRates,
-  getOverallChangeRate,
+  // getCategoryChangeRates,
+  // getOverallChangeRate,
 } from "./util";
 
 import { getExpenseStat } from "../../apis/stat";
@@ -16,7 +16,7 @@ import Header from "../../components/organisms/Header";
 import LoadingScreen from "../../components/organisms/LoadingScreen";
 import YearMonthPicker from "../../components/organisms/YearMonthPicker";
 import { ApiError } from "../../types/errorTypes";
-import { capitalize } from "../../utils/string";
+import { getCategoryLabel } from "../../utils/string";
 
 type View = "monthly" | "yearly";
 
@@ -84,7 +84,7 @@ const StatsPage = () => {
 
     return (
       <BarChart
-        barLabels={stats.map((stat) => capitalize(stat.categoryName))}
+        barLabels={stats.map((stat) => getCategoryLabel(stat.categoryId))}
         leftDataset={{
           label: leftLabel,
           data: stats.map((stat) => stat.previous),
@@ -96,7 +96,7 @@ const StatsPage = () => {
       />
     );
   };
-
+  /*
   const renderRecapContent = () => {
     const { totalPrevious, totalCurrent, totalChange } =
       getOverallChangeRate(stats);
@@ -208,7 +208,7 @@ const StatsPage = () => {
       </ul>
     );
   };
-
+*/
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -232,18 +232,18 @@ const StatsPage = () => {
     <S.Wrapper>
       <S.TopWrapper>
         <Header
-          title="Statistics"
-          description="Check your consumption by category."
+          title="지출 통계"
+          description="카테고리별 지출 현황을 확인하세요."
         />
         <S.ButtonGroup>
           <BasicButton
-            label="Monthly"
+            label="월간 비교"
             size="small"
             type={view === "monthly" ? "confirm" : "cancel"}
             onClick={() => setView("monthly")}
           />
           <BasicButton
-            label="Yearly"
+            label="연간 비교"
             size="small"
             type={view === "yearly" ? "confirm" : "cancel"}
             onClick={() => setView("yearly")}
@@ -258,8 +258,9 @@ const StatsPage = () => {
         />
         <S.ChartContainer>{renderBarChart()}</S.ChartContainer>
         <S.RecapContainer>
-          <S.RecapTitle>Recap</S.RecapTitle>
-          <S.RecapContent>{renderRecapContent()}</S.RecapContent>
+          <S.RecapTitle>요약</S.RecapTitle>
+          {/* <S.RecapContent>{renderRecapContent()}</S.RecapContent> */}
+          <S.RecapContent>{}</S.RecapContent>
         </S.RecapContainer>
       </S.CenterWrapper>
     </S.Wrapper>

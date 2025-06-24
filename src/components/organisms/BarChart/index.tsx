@@ -61,8 +61,7 @@ const BarChart = ({ barLabels, leftDataset, rightDataset }: Props) => {
     maintainAspectRatio: false, // 부모 크기에 맞춰서 canvas 크기 조정
     plugins: {
       legend: {
-        // 범례를 상단에 표시
-        position: "top",
+        display: false, // 범례 표시 X
       },
     },
     scales: {
@@ -80,7 +79,7 @@ const BarChart = ({ barLabels, leftDataset, rightDataset }: Props) => {
       y: {
         beginAtZero: true,
         grid: {
-          display: false,
+          display: true, // y축 선 표시 O
         },
       },
     },

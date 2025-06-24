@@ -1,6 +1,45 @@
+import categoryJson from "../shared/category.json";
+import txTypeJson from "../shared/txType.json";
+import txMethodJson from "../shared/txMethod.json";
+
+const categoryMap = new Map<number, (typeof categoryJson)[number]>(
+  categoryJson.map((c) => [c.id, c])
+);
+
+const txTypeMap = new Map<string, string>(
+  txTypeJson.map((t) => [t.name, t.label])
+);
+
+const txMethodMap = new Map<string, string>(
+  txMethodJson.map((t) => [t.name, t.label])
+);
+
 /**
- * 공백으로 구분된 소문자 문자열의 각 첫 글자를 대문자로 변환(e.g. bank transfer => Bank Transfer)
+ * category 목록 가져오기
  */
-export const capitalize = (str: string) => {
-  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+export const getCategories = () => {
+  return Array.from(categoryMap.values());
+};
+
+/**
+ * category label 가져오기
+ */
+export const getCategoryLabel = (categoryId: number) => {
+  return categoryMap.get(categoryId)?.label ?? "";
+};
+
+/**
+ * txType label 가져오기
+ */
+export const getTxTypeLabel = (txType: "income" | "expense") => {
+  return txTypeMap.get(txType) ?? "";
+};
+
+/**
+ * txMethod label 가져오기
+ */
+export const getTxMethodLabel = (
+  txMethod: "cash" | "debit card" | "credit card" | "bank transfer"
+) => {
+  return txMethodMap.get(txMethod) ?? "";
 };
