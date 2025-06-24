@@ -155,7 +155,7 @@ const MainLayout = () => {
             },
           ]}
         >
-          <p style={{ lineHeight: "1.5" }}>Are you sure you want to log out?</p>
+          <p style={{ lineHeight: "1.5" }}>로그아웃 하시겠어요?</p>
         </Modal>
       )}
     </>
